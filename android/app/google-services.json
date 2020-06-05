@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "464210738061",
+    "firebase_url": "https://grading-dating-app.firebaseio.com",
+    "project_id": "grading-dating-app",
+    "storage_bucket": "grading-dating-app.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:464210738061:android:bc3bd8769dfb5872cb1bc4",
+        "android_client_info": {
+          "package_name": "com.example.flutterdatingapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "464210738061-hu45thqef7harmsgd9u746r2l91hpq6q.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCJSPY-EgENXEpl8KqnbSwkuLNpJOLVFDI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "464210738061-hu45thqef7harmsgd9u746r2l91hpq6q.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "464210738061-r95v8c7cmrf5p0f3dj5d19435j33er2n.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.flutterdatingapp"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
