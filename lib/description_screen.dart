@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutterdatingapp/database_management_code/database.dart';
+import 'package:flutterdatingapp/database_management_code/online_database.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import './interests_screen.dart';
 import './color_scheme.dart';
@@ -20,26 +22,6 @@ class DescriptionScreen extends StatelessWidget {
 
   Widget descriptionAppBar(BuildContext context) {
     return appBar("Profile description", Icon(MdiIcons.cardText), context);
-
-    /*
-    return AppBar(
-      leading:
-      Row (children: <Widget>[
-        Flexible(child:
-        IconButton(icon: Icon(MdiIcons.arrowLeft), tooltip: "go back",
-          onPressed: (){Navigator.pop(context);},),
-          fit: FlexFit.tight,
-          flex: 1,
-        ),
-        Flexible(child:
-        Icon(MdiIcons.cardText),
-          fit: FlexFit.tight,
-          flex: 1,
-        ),
-      ],),
-      title: Text("Profile description"),
-      centerTitle: true,
-    );*/
   }
 }
 
@@ -138,19 +120,7 @@ class DescriptionScreen extends StatelessWidget {
             color: primary,
             onPressed: (){
 
-              setState(() {
-                isLoading = true;
-              });
-
-
-              /*
-              DescriptionAnalyzer analyzer = DescriptionAnalyzer();
-
-              String test = "I enjoy flutter but hate Net";
-              analyzer.analyze(test, context);*/
-
-
-              /*if (characterAmount > wordLimit)
+              if (characterAmount > wordLimit)
             {
               popup("Error", "Description too long.", context, (){});
             }
@@ -162,12 +132,24 @@ class DescriptionScreen extends StatelessWidget {
               }
               else
               {
+                setState(() {
+                  isLoading = true;
+                });
+
+                DescriptionAnalyzer analyzer = DescriptionAnalyzer();
+
+                String description = descriptionController.text;
+                analyzer.analyze(description, context);
+
+                OnlineDatabaseManager onlineManager = OnlineDatabaseManager();
+                onlineManager.addUserDescription(description);
+
                 toNewScreen(context);
               }
             }
 
-               */
-            toNewScreen(context);
+
+            //toNewScreen(context);
 
             },)
         ],

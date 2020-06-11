@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutterdatingapp/online_database.dart';
+import 'package:flutterdatingapp/database_management_code/online_database.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 
 import './picture_screen.dart';
@@ -15,8 +15,8 @@ class AccountScreen extends StatelessWidget
   final userNameController = TextEditingController();
   final userAgeController = TextEditingController();
 
-  String gender = "";
-  String lookingFor = "";
+  String gender = "Male";
+  String lookingFor = "Male";
 
   @override
   Widget build(BuildContext context) {
@@ -162,7 +162,7 @@ class AccountScreen extends StatelessWidget
 
     if (userNameController.text != "" && userAgeController.text != "")
       {
-        /*
+
         String name = userNameController.text;
         int age = int.parse(userAgeController.text);
 
@@ -176,7 +176,7 @@ class AccountScreen extends StatelessWidget
         else
           {
             popup("Error", error, context, (){});
-          }*/
+          }
 
       }
     else
@@ -187,7 +187,7 @@ class AccountScreen extends StatelessWidget
 
 
 
-    Navigator.push(context, MaterialPageRoute(builder: (context) => PictureScreen()));
+    //Navigator.push(context, MaterialPageRoute(builder: (context) => PictureScreen()));
 
   }
 

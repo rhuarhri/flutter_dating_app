@@ -7,7 +7,7 @@ import './grading_screen.dart';
 
 class SignInScreen extends StatelessWidget{
 
-  bool isSignIn = true;
+  bool isSignIn = false;
 
   final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
 

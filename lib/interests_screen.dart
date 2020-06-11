@@ -1,18 +1,21 @@
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutterdatingapp/DataModels.dart';
-import 'package:flutterdatingapp/database.dart';
+import 'package:flutterdatingapp/database_management_code/internal/DataModels.dart';
+import 'package:flutterdatingapp/database_management_code/database.dart';
+import 'package:flutterdatingapp/database_management_code/online_database.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 
 import './color_scheme.dart';
 import './common_widgets.dart';
 import './grading_screen.dart';
 
-import './description_analyzer.dart';
-
 class InterestsScreen extends StatelessWidget
 {
+  //TODO have some way for the user to show just how much they like or hate something
+  //this will be used in the search procedure to understand what the user can live
+  //with or can't live without.
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -105,7 +108,13 @@ class _InterestScreen extends State<InterestScreen>
   void updateLikedList()
   {
     DBProvider.db.getPositiveDescriptionValue().then((value) => {
-      refreshLikedList(value)
+      //refreshLikedList(value),
+    liked = value,
+      refreshLists(),
+
+      value.forEach((element) {
+        print("description value is " + element.name);
+      })
     });
   }
 
@@ -119,7 +128,13 @@ class _InterestScreen extends State<InterestScreen>
   void updateHatedList()
   {
     DBProvider.db.getNegativeDescriptionValue().then((value) => {
-      refreshHatedList(value)
+      //refreshHatedList(value),
+      hated = value,
+      refreshLists(),
+
+      value.forEach((element) {
+        print("description value is " + element.name);
+      })
     });
   }
 
@@ -127,6 +142,13 @@ class _InterestScreen extends State<InterestScreen>
   {
     setState(() {
       hated = newList;
+    });
+  }
+
+  void refreshLists()
+  {
+    setState(() {
+
     });
   }
 
@@ -141,6 +163,14 @@ class _InterestScreen extends State<InterestScreen>
         updateHatedList();
         receivedFromDatabase = true;
       }
+    else
+      {
+        print("already updated");
+      }
+
+    //updateLikedList();
+    //updateHatedList();
+
 
     return
     Column(
@@ -151,11 +181,15 @@ class _InterestScreen extends State<InterestScreen>
         listHeader(Icon(MdiIcons.thumbUp), "like", (){
           DescriptionValue newValue = DescriptionValue();
           newValue.name = likedController.text;
-          newValue.sentiment = 0.5; //positive sentiment value means it is liked
+          newValue.sentiment = 0.4; //positive sentiment value means it is liked
 
-          setState(() {
+          /*setState(() {
             liked.add(newValue);
-          });
+          });*/
+
+          addItem(newValue);
+
+
 
         }, likedController),
         color: primary,
@@ -193,12 +227,13 @@ class _InterestScreen extends State<InterestScreen>
             listHeader(Icon(MdiIcons.thumbDown), "hate", (){
               DescriptionValue newValue = DescriptionValue();
               newValue.name = hatedController.text;
-              newValue.sentiment = -0.5; //negative sentiment value means it is hated
+              newValue.sentiment = -0.4; //negative sentiment value means it is hated
 
-              setState(() {
+              /*setState(() {
                 hated.add(newValue);
-              });
+              });*/
 
+              addItem(newValue);
 
             }, hatedController),
 
@@ -244,15 +279,21 @@ class _InterestScreen extends State<InterestScreen>
         ),
 
         RaisedButton(child: Text("Done"), shape: buttonBorderStyle, color: primary, onPressed: (){
+
+          OnlineDatabaseManager onlineManage = OnlineDatabaseManager();
+          onlineManage.addLikesAndHates();
+          onlineManage.addDescriptionStyle();
+
           Navigator.push(context, MaterialPageRoute(builder: (context) => GradingScreen()));
 
-          //DescriptionAnalyzer test = DescriptionAnalyzer();
-          //test.analyze();
 
         },)
 
       ],);
+
   }
+
+
 
   Widget listHeader(Widget icon, String name, Function action, TextEditingController controller)
   {
@@ -346,7 +387,8 @@ class _InterestScreen extends State<InterestScreen>
         if (type == "liked")
           {
             setState(() {
-              deletePopup(context, hated[index], "liked");
+              deletePopup(context, liked[index], "liked");
+              deleteItem(liked[index].name);
               liked.removeAt(index);
             });
           }
@@ -354,6 +396,7 @@ class _InterestScreen extends State<InterestScreen>
           {
             setState(() {
               deletePopup(context, hated[index], "hated");
+              deleteItem(hated[index].name);
               hated.removeAt(index);
             });
           }
@@ -385,12 +428,21 @@ class _InterestScreen extends State<InterestScreen>
                   });
 
                 }
+
+              addItem(item);
             })));
+  }
+
+  void addItem(DescriptionValue newItem)
+  {
+    DBProvider.db.addDescriptionValue(newItem);
+    refreshLists();
   }
 
   void deleteItem(String name)
   {
     DBProvider.db.deleteDescriptionValue(name);
+    refreshLists();
   }
 
 }

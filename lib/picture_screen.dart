@@ -7,7 +7,7 @@ import './description_screen.dart';
 import './color_scheme.dart';
 import './common_widgets.dart';
 
-import './online_database.dart';
+import 'database_management_code/online_database.dart';
 
 
 class PictureScreen extends StatelessWidget
@@ -112,18 +112,20 @@ class _PictureScreenBody extends State<PictureScreenBody>
 
   void toNewScreen(context) async
   {
-    /*
+
     if (imageFile != null)
       {
         OnlineDatabaseManager uploadImage = OnlineDatabaseManager();
         uploadImage.addImage(await imageFile);
+
+        Navigator.push(context, MaterialPageRoute(builder: (context) => DescriptionScreen()));
       }
     else
       {
+          popup("Image upload", "Unable to load image pleas try again", context, (){});
+      }
 
-      }*/
-
-    Navigator.push(context, MaterialPageRoute(builder: (context) => DescriptionScreen()));
+    //Navigator.push(context, MaterialPageRoute(builder: (context) => DescriptionScreen()));
   }
 
   Future<File> imageFile;
