@@ -108,9 +108,9 @@ class _InterestScreen extends State<InterestScreen>
   void updateLikedList()
   {
     DBProvider.db.getPositiveDescriptionValue().then((value) => {
-      //refreshLikedList(value),
-    liked = value,
-      refreshLists(),
+      refreshLikedList(value),
+    //liked = value,
+      //refreshLists(),
 
       value.forEach((element) {
         print("description value is " + element.name);
@@ -128,9 +128,9 @@ class _InterestScreen extends State<InterestScreen>
   void updateHatedList()
   {
     DBProvider.db.getNegativeDescriptionValue().then((value) => {
-      //refreshHatedList(value),
-      hated = value,
-      refreshLists(),
+      refreshHatedList(value),
+      //hated = value,
+      //refreshLists(),
 
       value.forEach((element) {
         print("description value is " + element.name);
@@ -157,7 +157,7 @@ class _InterestScreen extends State<InterestScreen>
   @override
   Widget build(BuildContext context) {
 
-    if (receivedFromDatabase == false)
+    if (liked.isEmpty == true && hated.isEmpty == true)
       {
         updateLikedList();
         updateHatedList();
@@ -183,9 +183,9 @@ class _InterestScreen extends State<InterestScreen>
           newValue.name = likedController.text;
           newValue.sentiment = 0.4; //positive sentiment value means it is liked
 
-          /*setState(() {
+          setState(() {
             liked.add(newValue);
-          });*/
+          });
 
           addItem(newValue);
 
@@ -215,7 +215,15 @@ class _InterestScreen extends State<InterestScreen>
             itemCount: liked.length,
             itemBuilder: (BuildContext context, int Index)
             {
-              return listItem(liked[Index].name, "liked", Index);
+              if (liked[Index].sentiment >= 0.5)
+                {
+                  return listItem(liked[Index].name, "liked", Index, true, false);
+                }
+              else
+                {
+                  return listItem(liked[Index].name, "liked", Index, false, true);
+                }
+
             }
         ),
           fit: FlexFit.tight,
@@ -229,9 +237,9 @@ class _InterestScreen extends State<InterestScreen>
               newValue.name = hatedController.text;
               newValue.sentiment = -0.4; //negative sentiment value means it is hated
 
-              /*setState(() {
+              setState(() {
                 hated.add(newValue);
-              });*/
+              });
 
               addItem(newValue);
 
@@ -271,7 +279,15 @@ class _InterestScreen extends State<InterestScreen>
             itemCount: hated.length,
             itemBuilder: (BuildContext context, int Index)
               {
-                return listItem(hated[Index].name, "hated", Index);
+                if (hated[Index].sentiment <= -0.5)
+                  {
+                    return listItem(hated[Index].name, "hated", Index, true, false);
+                  }
+                else
+                  {
+                    return listItem(hated[Index].name, "hated", Index, false, true);
+                  }
+
              }
           ),
           fit: FlexFit.tight,
@@ -344,11 +360,14 @@ class _InterestScreen extends State<InterestScreen>
     ]);
   }
 
-  Widget listItem(String name, String type, int index)
+  //List<bool> isSelected = [false, true];
+
+  Widget listItem(String name, String type, int itemIndex, bool isMust, bool isOther)
   {
+    List<bool> isSelected = [isOther, isMust];
     return
     Dismissible(
-      key: ValueKey(name + index.toString()),
+      key: ValueKey(name + itemIndex.toString()),
       child:
       Container(
         child:
@@ -360,7 +379,48 @@ class _InterestScreen extends State<InterestScreen>
             Flexible(child:
             Text(name),
               fit: FlexFit.tight,
-              flex: 4,
+              flex: 1,
+            ),
+
+            Spacer(flex: 1,),
+
+            Flexible(child:
+            ToggleButtons(children: [Text("ok without"), Text("must have")], isSelected: isSelected,
+            onPressed: (int index){
+              setState(() {
+                double newSentimentValue = 0.4;
+
+                isSelected[index] = !isSelected[index];
+
+                if (index == 0)
+                  {
+                    //other item selected
+                    newSentimentValue = 0.4;
+
+                  }
+                else{
+                  //must have item selected
+                  newSentimentValue = 0.6;
+                }
+
+                setState(() {
+                  if(type == "liked")
+                  {
+                    liked[itemIndex].sentiment = (newSentimentValue);
+                    print("like sentiment value is " + newSentimentValue.toString() + " for item names " + liked[itemIndex].name);
+                  }
+                  else
+                  {
+                    hated[itemIndex].sentiment = (newSentimentValue - (newSentimentValue * 2));
+                    print("hated sentiment value is " + (newSentimentValue - (newSentimentValue * 2)).toString() + " for item names " + hated[itemIndex].name);
+                  }
+                });
+
+              });
+            },
+            ),
+            fit: FlexFit.tight,
+              flex: 2,
             ),
 
             Flexible(child:
@@ -387,17 +447,17 @@ class _InterestScreen extends State<InterestScreen>
         if (type == "liked")
           {
             setState(() {
-              deletePopup(context, liked[index], "liked");
-              deleteItem(liked[index].name);
-              liked.removeAt(index);
+              deletePopup(context, liked[itemIndex], "liked");
+              deleteItem(liked[itemIndex].name);
+              liked.removeAt(itemIndex);
             });
           }
         else
           {
             setState(() {
-              deletePopup(context, hated[index], "hated");
-              deleteItem(hated[index].name);
-              hated.removeAt(index);
+              deletePopup(context, hated[itemIndex], "hated");
+              deleteItem(hated[itemIndex].name);
+              hated.removeAt(itemIndex);
             });
           }
 
@@ -436,13 +496,13 @@ class _InterestScreen extends State<InterestScreen>
   void addItem(DescriptionValue newItem)
   {
     DBProvider.db.addDescriptionValue(newItem);
-    refreshLists();
+    //refreshLists();
   }
 
   void deleteItem(String name)
   {
     DBProvider.db.deleteDescriptionValue(name);
-    refreshLists();
+    //refreshLists();
   }
 
 }

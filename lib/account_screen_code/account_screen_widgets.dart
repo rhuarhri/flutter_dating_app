@@ -1,16 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutterdatingapp/database_management_code/online_database.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
+import '../color_scheme.dart';
+import '../common_widgets.dart';
 
-import './picture_screen.dart';
-import './color_scheme.dart';
-import './common_widgets.dart';
-
-
-
-class AccountScreen extends StatelessWidget
-{
+class AccountScreenWidgets {
 
   final userNameController = TextEditingController();
   final userAgeController = TextEditingController();
@@ -18,25 +12,20 @@ class AccountScreen extends StatelessWidget
   String gender = "Male";
   String lookingFor = "Male";
 
-  @override
+  /*@override
   Widget build(BuildContext context) {
-
     return Scaffold(
-      appBar: AccountScreen().accountAppBar(context),
-      body: AccountScreen().accountBody(context),
+      appBar: accountAppBar(context),
+      body: accountBody((){print("not this");}, context),
     );
-  }
+  }*/
 
-
-
-  Widget accountAppBar(BuildContext context)
-  {
-
+  Widget accountAppBar(BuildContext context) {
     return appBar("Create Account", Icon(MdiIcons.account), context);
   }
 
-  Widget accountBody(BuildContext context)
-  {
+
+  Widget accountBody(Function onCompleteAction, BuildContext context) {
     return
       Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -44,12 +33,12 @@ class AccountScreen extends StatelessWidget
         children: <Widget>[
           Flexible(child:
           Container(
-              //color: Colors.yellow,
+            //color: Colors.yellow,
               child:
               Column(children: <Widget>[
 
                 Row(children: <Widget>[
-                  Spacer(flex:1),
+                  Spacer(flex: 1),
                   Text("name",),
                   Flexible(child:
                   Container(child:
@@ -75,12 +64,12 @@ class AccountScreen extends StatelessWidget
 
 
                 Row(children: <Widget>[
-                  Spacer(flex:3),
+                  Spacer(flex: 3),
                   Text("age"),
                   Flexible(child:
                   Container(child:
                   TextField(
-                    controller: userAgeController,
+                      controller: userAgeController,
                       keyboardType: TextInputType.number,
                       inputFormatters: <TextInputFormatter>[
                         WhitelistingTextInputFormatter.digitsOnly],
@@ -109,7 +98,7 @@ class AccountScreen extends StatelessWidget
                   Text("gender"),
                   Flexible(child:
                   Container(child:
-                  DropdownStatefulWidget((String value){
+                  DropdownStatefulWidget((String value) {
                     gender = value;
                   }),
                     margin: EdgeInsets.all(16.0),
@@ -121,7 +110,7 @@ class AccountScreen extends StatelessWidget
                   Text("looking for"),
                   Flexible(child:
                   Container(child:
-                  DropdownStatefulWidget((String value){
+                  DropdownStatefulWidget((String value) {
                     lookingFor = value;
                   }),
                     margin: EdgeInsets.all(16.0),),
@@ -140,9 +129,13 @@ class AccountScreen extends StatelessWidget
           Container(
             //color: Colors.green,
             child: Row(children: <Widget>[
-              Spacer(flex:1),
-              RaisedButton(child: Text("Done"), shape: buttonBorderStyle, color: primary,
-                onPressed: (){toNewScreen(context);},),
+              Spacer(flex: 1),
+              RaisedButton(
+                child: Text("Done"), shape: buttonBorderStyle, color: primary,
+                onPressed: () {
+                  //toNewScreen(context);
+                  onCompleteAction.call();
+                },),
               Spacer(flex: 1,),
             ],),
           ),
@@ -151,72 +144,40 @@ class AccountScreen extends StatelessWidget
           )
 
         ],);
-
   }
 
 
-  void toNewScreen(context)
-  {
-
-    OnlineDatabaseManager manager = OnlineDatabaseManager();
-
-    if (userNameController.text != "" && userAgeController.text != "")
-      {
-
-        String name = userNameController.text;
-        int age = int.parse(userAgeController.text);
-
-        String error = manager.add(name, age, gender, lookingFor);
-
-        if (error == "")
-          {
-            //success
-            Navigator.push(context, MaterialPageRoute(builder: (context) => PictureScreen()));
-          }
-        else
-          {
-            popup("Error", error, context, (){});
-          }
-
-      }
-    else
-      {
-       popup("Error", "You must enter a value for name and age", context, (){});
-      }
 
 
-
-
-    //Navigator.push(context, MaterialPageRoute(builder: (context) => PictureScreen()));
-
-  }
 
 }
 
-class DropdownStatefulWidget extends StatefulWidget
-{
+class DropdownStatefulWidget extends StatefulWidget {
   final Function returnData;
+
   DropdownStatefulWidget(this.returnData);
 
   @override
   State<StatefulWidget> createState() {
     return _DropdownStatefulWidget(returnData);
   }
-
 }
 
-class _DropdownStatefulWidget extends State<DropdownStatefulWidget>
-{
+class _DropdownStatefulWidget extends State<DropdownStatefulWidget> {
   String currentValue = "Male";
 
   final Function returnData;
+
   _DropdownStatefulWidget(this.returnData);
 
   @override
   Widget build(BuildContext context) {
     return DropdownButton<String>(
       value: currentValue,
-      icon: Icon(MdiIcons.arrowDownDropCircle, color: primaryDark,),
+      icon: Icon(
+        MdiIcons.arrowDownDropCircle,
+        color: primaryDark,
+      ),
       iconSize: 24,
       elevation: 16,
       style: TextStyle(color: Colors.black),
@@ -224,15 +185,15 @@ class _DropdownStatefulWidget extends State<DropdownStatefulWidget>
         height: 2,
         color: primaryDark,
       ),
-      onChanged: (String chosen){
+      onChanged: (String chosen) {
         setState(() {
           currentValue = chosen;
         });
 
         returnData.call(chosen);
-
       },
-      items: <String>["Male", "Female"].map<DropdownMenuItem<String>>((String value) {
+      items: <String>["Male", "Female"]
+          .map<DropdownMenuItem<String>>((String value) {
         return DropdownMenuItem<String>(
           value: value,
           child: Text(value),
@@ -240,5 +201,4 @@ class _DropdownStatefulWidget extends State<DropdownStatefulWidget>
       }).toList(),
     );
   }
-  
 }

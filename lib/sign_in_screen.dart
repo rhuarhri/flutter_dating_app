@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
-import './account_screen.dart';
+import 'account_screen_code/account_screen.dart';
 import './color_scheme.dart';
 import './sign_in_handler.dart';
 import './grading_screen.dart';
 
 class SignInScreen extends StatelessWidget{
 
-  bool isSignIn = false;
+  bool isSignIn = true;
 
   final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
 
@@ -121,7 +121,7 @@ class SignInScreen extends StatelessWidget{
 
   void toNewScreen(context)
   {
-    Navigator.push(context, MaterialPageRoute(builder: (context) => AccountScreen()));
+    Navigator.push(context, MaterialPageRoute(builder: (context) => AccountAddScreen()));
   }
 
   void showTerms(BuildContext context)

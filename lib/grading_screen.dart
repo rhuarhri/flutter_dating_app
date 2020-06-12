@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutterdatingapp/account_screen_code/account_screen.dart';
+import 'package:flutterdatingapp/account_screen_code/account_update_screen.dart';
 import 'package:flutterdatingapp/description_analyzer.dart';
+import 'package:flutterdatingapp/description_screen_code/description_update_screen.dart';
+import 'package:flutterdatingapp/picture_screen_code/picture_update_screen.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import './color_scheme.dart';
 import './common_widgets.dart';
@@ -240,7 +244,10 @@ class _GradingPage extends State<GradingPage>
             Icon(MdiIcons.account),
             Text("Account")
           ],),
-            onPressed: () {},
+            onPressed: () {
+              Navigator.push(
+                  context, MaterialPageRoute(builder: (context) => AccountUpdateScreen()));
+            },
           ),
 
           RaisedButton(child:
@@ -248,7 +255,10 @@ class _GradingPage extends State<GradingPage>
             Icon(MdiIcons.imageSizeSelectActual),
             Text("image")
           ],),
-            onPressed: () {},
+            onPressed: () {
+              Navigator.push(
+                  context, MaterialPageRoute(builder: (context) => PictureUpdateScreen()));
+            },
           ),
 
           RaisedButton(child:
@@ -256,7 +266,10 @@ class _GradingPage extends State<GradingPage>
             Icon(MdiIcons.cardText),
             Text("Description")
           ],),
-            onPressed: () {},
+            onPressed: () {
+              Navigator.push(
+                  context, MaterialPageRoute(builder: (context) => DescriptionUpdateScreen()));
+            },
           ),
 
         ],
