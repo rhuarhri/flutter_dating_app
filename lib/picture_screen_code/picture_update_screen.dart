@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import '../description_screen_code/description_screen.dart';
+import 'package:flutterdatingapp/database_management_code/online_database.dart';
+import '../common_widgets.dart';
 import './picture_screen_widgets.dart';
 import 'dart:io';
 
@@ -14,23 +15,19 @@ class PictureUpdateScreen extends StatelessWidget
 
     Function onCompleteAction = () async
     {
-      Future<File> image = imageFile;
+      File image = await imageFile;
 
-      /*if (imageFile != null)
+      if (image != null)
       {
         OnlineDatabaseManager uploadImage = OnlineDatabaseManager();
-        uploadImage.addImage(await imageFile);
+        uploadImage.updateImage(image);
 
-        Navigator.push(context, MaterialPageRoute(builder: (context) => DescriptionScreen()));
+        Navigator.pop(context);
       }
     else
       {
-          popup("Image upload", "Unable to load image pleas try again", context, (){});
-      }*/
-
-      //TODO update user image
-
-      Navigator.pop(context);
+          popup("Image upload", "Unable to load image pleas try again", context, null);
+      }
     };
 
     return Scaffold(

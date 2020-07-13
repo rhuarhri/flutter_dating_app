@@ -1,8 +1,6 @@
 import 'package:sqflite/sqflite.dart';
 import './DataModels.dart';
 
-
-
 class AddToHistory
 {
   addHistory(Database db, String lastId) async
@@ -58,5 +56,8 @@ class UpdateToHistory
 
 class DeleteFromHistory
 {
-
+  void deleteAll(Database db)
+  {
+    db.delete("History");
+  }
 }

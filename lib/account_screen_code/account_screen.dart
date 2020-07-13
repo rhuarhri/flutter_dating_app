@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutterdatingapp/database_management_code/online_database.dart';
 import '../picture_screen_code/picture_screen.dart';
 import 'account_screen_widgets.dart';
+import '../common_widgets.dart';
 
 
 class AccountAddScreen extends StatelessWidget
@@ -11,7 +13,7 @@ class AccountAddScreen extends StatelessWidget
 
     Function onCompleteAction = ()
     {
-      /*OnlineDatabaseManager manager = OnlineDatabaseManager();
+      OnlineDatabaseManager manager = OnlineDatabaseManager();
 
     if (userNameController.text != "" && userAgeController.text != "")
     {
@@ -36,10 +38,8 @@ class AccountAddScreen extends StatelessWidget
     else
     {
       popup("Error", "You must enter a value for name and age", context, (){});
-    }*/
+    }
 
-      Navigator.push(
-          context, MaterialPageRoute(builder: (context) => PictureScreen()));
     };
 
     return Scaffold(

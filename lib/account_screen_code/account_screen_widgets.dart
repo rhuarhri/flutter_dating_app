@@ -4,26 +4,17 @@ import 'package:material_design_icons_flutter/material_design_icons_flutter.dart
 import '../color_scheme.dart';
 import '../common_widgets.dart';
 
+TextEditingController userNameController = TextEditingController();
+TextEditingController userAgeController = TextEditingController();
+
+String gender = "Male";
+String lookingFor = "Male";
+
 class AccountScreenWidgets {
-
-  final userNameController = TextEditingController();
-  final userAgeController = TextEditingController();
-
-  String gender = "Male";
-  String lookingFor = "Male";
-
-  /*@override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: accountAppBar(context),
-      body: accountBody((){print("not this");}, context),
-    );
-  }*/
 
   Widget accountAppBar(BuildContext context) {
     return appBar("Create Account", Icon(MdiIcons.account), context);
   }
-
 
   Widget accountBody(Function onCompleteAction, BuildContext context) {
     return
@@ -93,8 +84,10 @@ class AccountScreenWidgets {
                 ],),
 
 
-                Row(children: [
-                  Spacer(flex: 2,),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                  Spacer(flex: 1,),
                   Text("gender"),
                   Flexible(child:
                   Container(child:
@@ -104,7 +97,7 @@ class AccountScreenWidgets {
                     margin: EdgeInsets.all(16.0),
                   ),
                     fit: FlexFit.loose,
-                    flex: 3,
+                    flex: 4,
                   ),
                   Spacer(flex: 1,),
                   Text("looking for"),
@@ -115,7 +108,7 @@ class AccountScreenWidgets {
                   }),
                     margin: EdgeInsets.all(16.0),),
                     fit: FlexFit.loose,
-                    flex: 3,
+                    flex: 4,
                   ),
                   Spacer(flex: 1,),
                 ],),
@@ -176,7 +169,7 @@ class _DropdownStatefulWidget extends State<DropdownStatefulWidget> {
       value: currentValue,
       icon: Icon(
         MdiIcons.arrowDownDropCircle,
-        color: primaryDark,
+        color: secondaryDark,
       ),
       iconSize: 24,
       elevation: 16,

@@ -16,8 +16,7 @@ class BaseScreen extends StatelessWidget
     return MaterialApp(
       title: "app name",
       theme: ThemeData(
-        primaryColor: primary
-
+        primaryColor: primary,
       ),
         home: SignInScreen()
 

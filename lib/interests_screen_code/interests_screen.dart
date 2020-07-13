@@ -6,15 +6,12 @@ import 'package:flutterdatingapp/database_management_code/database.dart';
 import 'package:flutterdatingapp/database_management_code/online_database.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 
-import './color_scheme.dart';
-import './common_widgets.dart';
-import './grading_screen.dart';
+import '../color_scheme.dart';
+import '../common_widgets.dart';
+import '../grading_screen.dart';
 
 class InterestsScreen extends StatelessWidget
 {
-  //TODO have some way for the user to show just how much they like or hate something
-  //this will be used in the search procedure to understand what the user can live
-  //with or can't live without.
 
   @override
   Widget build(BuildContext context) {
@@ -23,67 +20,6 @@ class InterestsScreen extends StatelessWidget
       body: InterestScreen(),
     );
   }
-
- /* Widget interestsScreen(context)
-  {
-    return
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: <Widget>[
-            Flexible(child:
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: <Widget>[
-              Icon(MdiIcons.thumbUp),
-              Text("Likes"),
-              IconButton(icon: Icon(MdiIcons.plusCircle, color: primaryDark,), onPressed: (){
-
-              },)
-            ],),
-              fit: FlexFit.tight,
-              flex: 1,
-            ),
-
-            Flexible(child:
-           ListHandler(true),
-              fit: FlexFit.tight,
-              flex: 7,
-            ),
-
-            Flexible(child:
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: <Widget>[
-              Icon(MdiIcons.thumbDown),
-              Text("Hates"),
-              IconButton(icon: Icon(MdiIcons.plusCircle, color: primaryDark,), onPressed: (){
-
-              },)
-            ],),
-              fit: FlexFit.tight,
-              flex: 1,
-            ),
-
-            Flexible(child:
-                ListHandler(false),
-              fit: FlexFit.tight,
-              flex: 7,
-            ),
-
-            RaisedButton(child: Text("Done"), shape: buttonBorderStyle, color: primary, onPressed: (){
-              Navigator.push(context, MaterialPageRoute(builder: (context) => GradingScreen()));
-
-              //DescriptionAnalyzer test = DescriptionAnalyzer();
-              //test.analyze();
-
-            },)
-
-        ],);
-  }*/
-
-
-
-
 
 }
 
@@ -109,8 +45,6 @@ class _InterestScreen extends State<InterestScreen>
   {
     DBProvider.db.getPositiveDescriptionValue().then((value) => {
       refreshLikedList(value),
-    //liked = value,
-      //refreshLists(),
 
       value.forEach((element) {
         print("description value is " + element.name);
@@ -129,8 +63,6 @@ class _InterestScreen extends State<InterestScreen>
   {
     DBProvider.db.getNegativeDescriptionValue().then((value) => {
       refreshHatedList(value),
-      //hated = value,
-      //refreshLists(),
 
       value.forEach((element) {
         print("description value is " + element.name);
@@ -168,10 +100,6 @@ class _InterestScreen extends State<InterestScreen>
         print("already updated");
       }
 
-    //updateLikedList();
-    //updateHatedList();
-
-
     return
     Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -189,26 +117,11 @@ class _InterestScreen extends State<InterestScreen>
 
           addItem(newValue);
 
-
-
         }, likedController),
         color: primary,
 
         ),
 
-        /*Flexible(child:
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: <Widget>[
-            Icon(MdiIcons.thumbUp),
-            Text("Likes"),
-            IconButton(icon: Icon(MdiIcons.plusCircle, color: primaryDark,), onPressed: (){
-
-            },)
-          ],),
-          fit: FlexFit.tight,
-          flex: 1,
-        ),*/
 
         Flexible(child:
         ListView.builder(
@@ -227,7 +140,7 @@ class _InterestScreen extends State<InterestScreen>
             }
         ),
           fit: FlexFit.tight,
-          flex: 7,
+          flex: 6,
         ),
 
         Flexible(child:
@@ -245,29 +158,6 @@ class _InterestScreen extends State<InterestScreen>
 
             }, hatedController),
 
-
-
-            /*TextField(decoration: InputDecoration(
-                //border: InputBorder(borderSide:  BorderSide(color: primaryDark, width: 2)),
-
-                //Border(right: BorderSide(color: primaryDark, width: 2)),
-                hintText: "add hate",
-            )),
-              color: Colors.white,
-
-            ),
-            fit: FlexFit.tight,
-            flex: 3,
-            ),
-
-            Flexible(child:
-            IconButton(icon: Icon(MdiIcons.plusCircle, color: primaryDark,), onPressed: (){
-
-            },),
-              fit: FlexFit.loose,
-              flex: 1,
-            ),*/
-          //],),
             color: primary,
             ),
           fit: FlexFit.tight,
@@ -291,22 +181,44 @@ class _InterestScreen extends State<InterestScreen>
              }
           ),
           fit: FlexFit.tight,
-          flex: 7,
+          flex: 6,
         ),
 
-        RaisedButton(child: Text("Done"), shape: buttonBorderStyle, color: primary, onPressed: (){
-
-          OnlineDatabaseManager onlineManage = OnlineDatabaseManager();
-          onlineManage.addLikesAndHates();
-          onlineManage.addDescriptionStyle();
-
-          Navigator.push(context, MaterialPageRoute(builder: (context) => GradingScreen()));
-
-
-        },)
+        loadingDisplay(),
 
       ],);
 
+  }
+
+  bool isLoading = false;
+  Widget loadingDisplay()
+  {
+    if (isLoading == true)
+    {
+      return
+        Flexible(child: LinearProgressIndicator(), fit: FlexFit.loose, flex: 2,);
+
+    }
+    else
+    {
+      return RaisedButton(child: Text("Done"), shape: buttonBorderStyle, color: primary, onPressed: (){
+
+        setState(() {
+          isLoading = true;
+        });
+
+       toNewScreen(context);
+
+
+      },);
+
+    }
+  }
+
+  void toNewScreen(BuildContext context) async
+  {
+    await OnlineDatabaseManager().addLikesAndHates();
+    Navigator.push(context, MaterialPageRoute(builder: (context) => GradingScreen()));
   }
 
 
@@ -347,7 +259,7 @@ class _InterestScreen extends State<InterestScreen>
                 ),
 
                 Flexible(child:
-                  IconButton(icon: Icon(MdiIcons.plusCircle, color: primaryDark,), onPressed: action),
+                  IconButton(icon: Icon(MdiIcons.plusCircle, color: secondaryDark,), onPressed: action),
                   fit: FlexFit.loose,
                   flex: 1,
                 )
@@ -359,8 +271,6 @@ class _InterestScreen extends State<InterestScreen>
     ),
     ]);
   }
-
-  //List<bool> isSelected = [false, true];
 
   Widget listItem(String name, String type, int itemIndex, bool isMust, bool isOther)
   {
@@ -385,7 +295,10 @@ class _InterestScreen extends State<InterestScreen>
             Spacer(flex: 1,),
 
             Flexible(child:
-            ToggleButtons(children: [Text("ok without"), Text("must have")], isSelected: isSelected,
+            ToggleButtons(
+              borderColor: primaryDark,
+              borderWidth: 3,
+              children: [Text("ok without"), Text("must have")], isSelected: isSelected,
             onPressed: (int index){
               setState(() {
                 double newSentimentValue = 0.4;
@@ -408,11 +321,13 @@ class _InterestScreen extends State<InterestScreen>
                   {
                     liked[itemIndex].sentiment = (newSentimentValue);
                     print("like sentiment value is " + newSentimentValue.toString() + " for item names " + liked[itemIndex].name);
+                    updateItem(liked[itemIndex]);
                   }
                   else
                   {
                     hated[itemIndex].sentiment = (newSentimentValue - (newSentimentValue * 2));
                     print("hated sentiment value is " + (newSentimentValue - (newSentimentValue * 2)).toString() + " for item names " + hated[itemIndex].name);
+                    updateItem(hated[itemIndex]);
                   }
                 });
 
@@ -420,11 +335,11 @@ class _InterestScreen extends State<InterestScreen>
             },
             ),
             fit: FlexFit.tight,
-              flex: 2,
+              flex: 3,
             ),
 
             Flexible(child:
-            IconButton(icon: Icon(MdiIcons.delete), color: primaryDark, onPressed: (){
+            IconButton(icon: Icon(MdiIcons.delete), color: secondary, onPressed: (){
               //deleteItem(name);
             },),
               fit: FlexFit.loose,
@@ -461,8 +376,6 @@ class _InterestScreen extends State<InterestScreen>
             });
           }
 
-
-
       },
     );
   }
@@ -495,71 +408,22 @@ class _InterestScreen extends State<InterestScreen>
 
   void addItem(DescriptionValue newItem)
   {
-    DBProvider.db.addDescriptionValue(newItem);
+    newItem.name = newItem.name.toLowerCase();
+    DBProvider.db.userAddDescriptionValue(newItem);
     //refreshLists();
+  }
+
+  void updateItem(DescriptionValue newItem)
+  {
+    newItem.name = newItem.name.toLowerCase();
+    DBProvider.db.updateDescriptionValue(newItem);
   }
 
   void deleteItem(String name)
   {
-    DBProvider.db.deleteDescriptionValue(name);
+    String findName = name.toLowerCase();
+    DBProvider.db.deleteDescriptionValue(findName);
     //refreshLists();
   }
 
 }
-
-/*
-
-class listHandler extends StatefulWidget
-{
-  bool isPositive;
-
-  ListHandler(this.isPositive);
-
-  @override
-  State<StatefulWidget> createState() {
-    return _ListHandler(isPositive);
-  }
-
-}
-
-class _ListHandler extends State<ListHandler>
-{
-
-  //List<DescriptionValue> items = [];
-
-  List<DescriptionValue> liked = [];
-  List<DescriptionValue> hated = [];
-
-  bool isPositive;
-
-  _ListHandler(this.isPositive);
-
-
-
-  @override
-  Widget build(BuildContext context) {
-
-    updateList();
-
-      if(isPositive == true)
-        {
-         return
-        }
-      else
-        {
-          return
-        }
-
-
-
-
-
-
-    return ListView(children: <Widget>[
-
-    ],);
-  }
-
-
-
-}*/

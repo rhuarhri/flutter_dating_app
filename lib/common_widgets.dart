@@ -7,16 +7,26 @@ Widget helpButtons(String helpContent, String tipContent, BuildContext context)
 {
   return
     Row(children: <Widget>[
-      IconButton(icon: Icon(MdiIcons.helpCircle),
-        color: primaryDark, tooltip: "helpful information",
-        onPressed: (){popup("Help", helpContent, context, (){});},),
-      IconButton(icon: Icon(MdiIcons.lightbulbOn),
-        color: primaryDark, tooltip: "pro tips",
-        onPressed: (){popup("Pro tip", tipContent, context, (){});},)
+      infoButton(helpContent, context),
+      tipButton(tipContent, context),
     ],
       mainAxisAlignment: MainAxisAlignment.end,
     );
 
+}
+
+Widget infoButton(String helpContent, BuildContext context)
+{
+  return IconButton(icon: Icon(MdiIcons.helpCircle),
+      color: secondary, tooltip: "helpful information",
+      onPressed: (){popup("Help", helpContent, context, (){});});
+}
+
+Widget tipButton(String tipContent, BuildContext context)
+{
+  return IconButton(icon: Icon(MdiIcons.lightbulbOn),
+    color: secondary, tooltip: "pro tips",
+    onPressed: (){popup("Pro tip", tipContent, context, (){});},);
 }
 
 popup(String title, String content, BuildContext context, Function action)
@@ -30,7 +40,15 @@ popup(String title, String content, BuildContext context, Function action)
       elevation: 24.0,
       actions: [
         FlatButton( child: Text("More info"), onPressed: () {
-          action();
+          if (action == null)
+            {
+              Navigator.pop(context);
+            }
+          else
+            {
+              action.call();
+            }
+
         }, )
       ],
       shape: buttonBorderStyle,
@@ -38,6 +56,20 @@ popup(String title, String content, BuildContext context, Function action)
 
   });
 
+}
+
+errorPopup(String error, BuildContext context)
+{
+  return showDialog(context: context, builder: (context){
+
+    return AlertDialog(
+      title: Text("ERROR"),
+      content: Text(error),
+      elevation: 24.0,
+      shape: buttonBorderStyle,
+    );
+
+  });
 }
 
 Widget appBar(String title, Widget icon, BuildContext context)
@@ -61,23 +93,3 @@ Widget appBar(String title, Widget icon, BuildContext context)
     centerTitle: true,
   );
 }
-
-/*Widget progressBar()
-{
-
-
-  return LinearProgressIndicator();
-
-  *//*
-  return Stack(children: [
-
-    Positioned(child: LinearProgressIndicator(),
-    top: 70,
-    right: 50,
-    )
-
-  ],);*//*
-
-
-
-}*/

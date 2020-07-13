@@ -63,6 +63,8 @@ target 'Runner' do
 
   # Keep pod path relative so it can be checked into Podfile.lock.
   pod 'Flutter', :path => 'Flutter'
+  pod 'Firebase/MLVision', '6.25.0'
+  pod 'Firebase/MLVisionFaceModel', '6.25.0'
 
   # Plugin Pods
 

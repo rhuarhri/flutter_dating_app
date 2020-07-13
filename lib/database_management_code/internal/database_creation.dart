@@ -8,6 +8,9 @@ class DatabaseCreator
     _createUserInfoTable(db);
     _createDescriptionValueTable(db);
     _createHistoryTable(db);
+    _createBlockedTable(db);
+    _createMatchesTable(db);
+    _createMessageAmountTable(db);
   }
 
   void _createUserInfoTable(Database db) async
@@ -15,11 +18,13 @@ class DatabaseCreator
     await db.execute("CREATE TABLE UserInfo (" +
         "id INTEGER PRIMARY KEY AUTOINCREMENT," +
         "online_location TEXT," +
-        "age INTEGER," +
+        "minAge INTEGER," +
+        "maxAge INTEGER," +
         "lookingFor TEXT," +
         "descriptionStyle TEXT," +
-        "latitude DOUBLE," +
-        "longitude DOUBLE" +
+        "faceShape TEXT, " +
+        "accuracy INTEGER,"
+        "distance DOUBLE " +
         ")");
   }
 
@@ -27,8 +32,10 @@ class DatabaseCreator
   {
     await db.execute("CREATE TABLE DescriptionValue (" +
         "id INTEGER PRIMARY KEY AUTOINCREMENT," +
-        "name TEXT,"+
-        "sentiment DOUBLE" +
+        "name TEXT, "+
+        "sentiment DOUBLE, " +
+        "matchable INTEGER, " +
+        "interestScore INTEGER "+
         ")");
   }
 
@@ -39,6 +46,35 @@ class DatabaseCreator
     await db.execute("CREATE TABLE History (" +
         "id INTEGER PRIMARY KEY AUTOINCREMENT," +
         "lastId TEXT)");
+  }
+
+  void _createBlockedTable(Database db) async
+  {
+    db.execute("CREATE TABLE Blocked (" +
+        "id INTEGER PRIMARY KEY AUTOINCREMENT," +
+        "blockedId TEXT)");
+  }
+
+  void _createMatchesTable(Database db)
+  {
+    db.execute("CREATE TABLE Matched (" +
+    "id INTEGER PRIMARY KEY AUTOINCREMENT," +
+        "accountId TEXT, " +
+        "rating INTEGER, " +
+        "isTalkingTo INTEGER, "+
+        "name TEXT, "+
+        "image TEXT, " +
+        "description TEXT " +
+    ")"
+    );
+  }
+
+  void _createMessageAmountTable(Database db)
+  {
+    db.execute("CREATE TABLE Messages (" +
+        "id INTEGER PRIMARY KEY AUTOINCREMENT," +
+        "messageAmount INTEGER )"
+    );
   }
 
 }

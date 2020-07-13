@@ -7,6 +7,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:flutterdatingapp/database_management_code/internal/DataModels.dart';
 import 'package:flutterdatingapp/description_analyzer.dart';
 
 import 'package:flutterdatingapp/main.dart';
@@ -81,15 +82,34 @@ void main() {
 
   group("search functionality testing", (){
 
+    List<DescriptionValue> setupList(List<String> input)
+    {
+      List<DescriptionValue> dummyData = [];
+
+      input.forEach((element) {
+
+        DescriptionValue value = DescriptionValue();
+        value.matchable = 1; //i.e. true
+        value.sentiment = 0.5;//not important for testing
+        value.name = element;
+
+        dummyData.add(value);
+      });
+
+      return dummyData;
+
+    }
+
+
     test("perfect match test", (){
 
       List<String> accountLikes = ["1", "2", "3", "4", "5"];
       List<String> accountHates = ["6", "7", "8", "9", "10"];
 
-      List<String> userLikes = ["1", "2", "3", "4", "5"];
-      List<String> userMustHaves = ["1", "2", "3"];
-      List<String> userHates = ["6", "7", "8", "9", "10"];
-      List<String> userMustNotHaves = ["a", "b", "c"];
+      List<DescriptionValue> userLikes = setupList(["1", "2", "3", "4", "5"]);
+      List<DescriptionValue> userMustHaves = setupList(["1", "2", "3"]);
+      List<DescriptionValue> userHates = setupList(["6", "7", "8", "9", "10"]);
+      List<DescriptionValue> userMustNotHaves = setupList(["a", "b", "c"]);
 
       Searcher searcher = Searcher();
 
@@ -100,16 +120,69 @@ void main() {
 
     });
 
+    test("empty user input test", (){
+      //In this test the algorithm will not be able to find a match
+      //as the user will not provide anything to match
+      //however the result should be a 100 percent match.
+      int expected = 100;
+      //This is because the algorithm should filter the results
+      //based on the user's information, so not information no filtering.
+
+
+      List<String> accountLikes = ["1", "2", "3", "4", "5"];
+      List<String> accountHates = ["6", "7", "8", "9", "10"];
+
+      List<DescriptionValue> userLikes = [];
+      List<DescriptionValue> userMustHaves = [];
+      List<DescriptionValue> userHates = [];
+      List<DescriptionValue> userMustNotHaves = [];
+
+      Searcher searcher = Searcher();
+
+      int result = searcher.calculateMatchRate(accountLikes, accountHates,
+          userLikes, userHates, userMustHaves, userMustNotHaves);
+
+      expect(result, expected);
+
+    });
+
+    test("empty account input test", (){
+      /*
+      This is to test if the algorithm gets empty account information.
+       */
+      double expected = 0;
+      /*since the user has likes and hates which cannot be matched
+      against user account then there will be no matches and without matches
+      the account should get the lowest possible score.
+       */
+
+      List<String> accountLikes = [];
+      List<String> accountHates = [];
+
+      List<DescriptionValue> userLikes = setupList(["1", "2", "3", "4", "5"]);
+      List<DescriptionValue> userMustHaves = setupList(["1", "2", "3"]);
+      List<DescriptionValue> userHates = setupList(["6", "7", "8", "9", "10"]);
+      List<DescriptionValue> userMustNotHaves = setupList(["a", "b", "c"]);
+
+      Searcher searcher = Searcher();
+
+      int result = searcher.calculateMatchRate(accountLikes, accountHates,
+          userLikes, userHates, userMustHaves, userMustNotHaves);
+
+      expect(result, expected);
+
+    });
+
     test("user Must have different by 1", (){
 
       List<String> accountLikes = ["1", "2", "3", "4", "5"];
       List<String> accountHates = ["6", "7", "8", "9", "10"];
 
-      List<String> userLikes = ["1", "2", "3", "4", "5"];
+      List<DescriptionValue> userLikes = setupList(["1", "2", "3", "4", "5"]);
       //user must have has value 'a' which cannot be matched
-      List<String> userMustHaves = ["1", "2", "a"];
-      List<String> userHates = ["6", "7", "8", "9", "10"];
-      List<String> userMustNotHaves = ["a", "b", "c"];
+      List<DescriptionValue> userMustHaves = setupList(["1", "2", "a"]);
+      List<DescriptionValue> userHates = setupList(["6", "7", "8", "9", "10"]);
+      List<DescriptionValue> userMustNotHaves = setupList(["a", "b", "c"]);
 
       Searcher searcher = Searcher();
 
@@ -125,11 +198,11 @@ void main() {
       List<String> accountLikes = ["1", "2", "3", "4", "5"];
       List<String> accountHates = ["6", "7", "8", "9", "10"];
 
-      List<String> userLikes = ["1", "2", "3", "4", "5"];
+      List<DescriptionValue> userLikes = setupList(["1", "2", "3", "4", "5"]);
       //user must have has values 'a' and 'b' which cannot be matched
-      List<String> userMustHaves = ["1", "a", "b"];
-      List<String> userHates = ["6", "7", "8", "9", "10"];
-      List<String> userMustNotHaves = ["a", "b", "c"];
+      List<DescriptionValue> userMustHaves = setupList(["1", "a", "b"]);
+      List<DescriptionValue> userHates = setupList(["6", "7", "8", "9", "10"]);
+      List<DescriptionValue> userMustNotHaves = setupList(["a", "b", "c"]);
 
       Searcher searcher = Searcher();
 
@@ -145,11 +218,11 @@ void main() {
       List<String> accountLikes = ["1", "2", "3", "4", "5"];
       List<String> accountHates = ["6", "7", "8", "9", "10"];
 
-      List<String> userLikes = ["1", "2", "3", "4", "5"];
+      List<DescriptionValue> userLikes = setupList(["1", "2", "3", "4", "5"]);
       //user must have has no values that can be matched
-      List<String> userMustHaves = ["c", "a", "b"];
-      List<String> userHates = ["6", "7", "8", "9", "10"];
-      List<String> userMustNotHaves = ["a", "b", "c"];
+      List<DescriptionValue> userMustHaves = setupList(["c", "a", "b"]);
+      List<DescriptionValue> userHates = setupList(["6", "7", "8", "9", "10"]);
+      List<DescriptionValue> userMustNotHaves = setupList(["a", "b", "c"]);
 
       Searcher searcher = Searcher();
 
@@ -166,10 +239,10 @@ void main() {
       List<String> accountHates = ["6", "7", "8", "9", "10"];
 
       //user likes value 'a' cannot be matched
-      List<String> userLikes = ["a", "2", "3", "4", "5"];
-      List<String> userMustHaves = ["1", "2", "3"];
-      List<String> userHates = ["6", "7", "8", "9", "10"];
-      List<String> userMustNotHaves = ["a", "b", "c"];
+      List<DescriptionValue> userLikes = setupList(["a", "2", "3", "4", "5"]);
+      List<DescriptionValue> userMustHaves = setupList(["1", "2", "3"]);
+      List<DescriptionValue> userHates = setupList(["6", "7", "8", "9", "10"]);
+      List<DescriptionValue> userMustNotHaves = setupList(["a", "b", "c"]);
 
       Searcher searcher = Searcher();
 
@@ -186,10 +259,10 @@ void main() {
       List<String> accountHates = ["6", "7", "8", "9", "10"];
 
       //user like values 'a', 'b', 'c', cannot be matched
-      List<String> userLikes = ["a", "b", "c", "4", "5"];
-      List<String> userMustHaves = ["1", "2", "3"];
-      List<String> userHates = ["6", "7", "8", "9", "10"];
-      List<String> userMustNotHaves = ["a", "b", "c"];
+      List<DescriptionValue> userLikes = setupList(["a", "b", "c", "4", "5"]);
+      List<DescriptionValue> userMustHaves = setupList(["1", "2", "3"]);
+      List<DescriptionValue> userHates = setupList(["6", "7", "8", "9", "10"]);
+      List<DescriptionValue> userMustNotHaves = setupList(["a", "b", "c"]);
 
       Searcher searcher = Searcher();
 
@@ -206,10 +279,10 @@ void main() {
       List<String> accountHates = ["6", "7", "8", "9", "10"];
 
       //user likes cannot be matched
-      List<String> userLikes = ["a", "b", "c", "d", "e"];
-      List<String> userMustHaves = ["1", "2", "3"];
-      List<String> userHates = ["6", "7", "8", "9", "10"];
-      List<String> userMustNotHaves = ["a", "b", "c"];
+      List<DescriptionValue> userLikes = setupList(["a", "b", "c", "d", "e"]);
+      List<DescriptionValue> userMustHaves = setupList(["1", "2", "3"]);
+      List<DescriptionValue> userHates = setupList(["6", "7", "8", "9", "10"]);
+      List<DescriptionValue> userMustNotHaves = setupList(["a", "b", "c"]);
 
       Searcher searcher = Searcher();
 
@@ -225,10 +298,10 @@ void main() {
       List<String> accountLikes = ["1", "2", "3", "4", "5"];
       List<String> accountHates = ["6", "7", "8", "9", "10"];
 
-      List<String> userLikes = ["1", "2", "3", "4", "5"];
-      List<String> userMustHaves = ["1", "2", "3"];
-      List<String> userHates = ["6", "7", "8", "9", "10"];
-      List<String> userMustNotHaves = ["1", "b", "c"];
+      List<DescriptionValue> userLikes = setupList(["1", "2", "3", "4", "5"]);
+      List<DescriptionValue> userMustHaves = setupList(["1", "2", "3"]);
+      List<DescriptionValue> userHates = setupList(["6", "7", "8", "9", "10"]);
+      List<DescriptionValue> userMustNotHaves = setupList(["1", "b", "c"]);
 
       Searcher searcher = Searcher();
 
@@ -244,10 +317,10 @@ void main() {
       List<String> accountLikes = ["1", "2", "3", "4", "5"];
       List<String> accountHates = ["6", "7", "8", "9", "10"];
 
-      List<String> userLikes = ["1", "2", "3", "4", "5"];
-      List<String> userMustHaves = ["1", "2", "3"];
-      List<String> userHates = ["6", "7", "8", "9", "10"];
-      List<String> userMustNotHaves = ["1", "2", "c"];
+      List<DescriptionValue> userLikes = setupList(["1", "2", "3", "4", "5"]);
+      List<DescriptionValue> userMustHaves = setupList(["1", "2", "3"]);
+      List<DescriptionValue> userHates = setupList(["6", "7", "8", "9", "10"]);
+      List<DescriptionValue> userMustNotHaves = setupList(["1", "2", "c"]);
 
       Searcher searcher = Searcher();
 
@@ -263,10 +336,10 @@ void main() {
       List<String> accountLikes = ["1", "2", "3", "4", "5"];
       List<String> accountHates = ["6", "7", "8", "9", "10"];
 
-      List<String> userLikes = ["1", "2", "3", "4", "5"];
-      List<String> userMustHaves = ["1", "2", "3"];
-      List<String> userHates = ["6", "7", "8", "9", "10"];
-      List<String> userMustNotHaves = ["1", "2", "3"];
+      List<DescriptionValue> userLikes = setupList(["1", "2", "3", "4", "5"]);
+      List<DescriptionValue> userMustHaves = setupList(["1", "2", "3"]);
+      List<DescriptionValue> userHates = setupList(["6", "7", "8", "9", "10"]);
+      List<DescriptionValue> userMustNotHaves = setupList(["1", "2", "3"]);
 
       Searcher searcher = Searcher();
 
@@ -282,10 +355,10 @@ void main() {
       List<String> accountLikes = ["1", "2", "3", "4", "5"];
       List<String> accountHates = ["6", "7", "8", "9", "10"];
 
-      List<String> userLikes = ["1", "2", "3", "4", "5"];
-      List<String> userMustHaves = ["1", "2", "3"];
-      List<String> userHates = ["1", "7", "8", "9", "10"];
-      List<String> userMustNotHaves = ["a", "b", "c"];
+      List<DescriptionValue> userLikes = setupList(["1", "2", "3", "4", "5"]);
+      List<DescriptionValue> userMustHaves = setupList(["1", "2", "3"]);
+      List<DescriptionValue> userHates = setupList(["1", "7", "8", "9", "10"]);
+      List<DescriptionValue> userMustNotHaves = setupList(["a", "b", "c"]);
 
       Searcher searcher = Searcher();
 
@@ -301,10 +374,10 @@ void main() {
       List<String> accountLikes = ["1", "2", "3", "4", "5"];
       List<String> accountHates = ["6", "7", "8", "9", "10"];
 
-      List<String> userLikes = ["1", "2", "3", "4", "5"];
-      List<String> userMustHaves = ["1", "2", "3"];
-      List<String> userHates = ["1", "2", "3", "9", "10"];
-      List<String> userMustNotHaves = ["a", "b", "c"];
+      List<DescriptionValue> userLikes = setupList(["1", "2", "3", "4", "5"]);
+      List<DescriptionValue> userMustHaves = setupList(["1", "2", "3"]);
+      List<DescriptionValue> userHates = setupList(["1", "2", "3", "9", "10"]);
+      List<DescriptionValue> userMustNotHaves = setupList(["a", "b", "c"]);
 
       Searcher searcher = Searcher();
 
@@ -320,10 +393,10 @@ void main() {
       List<String> accountLikes = ["1", "2", "3", "4", "5"];
       List<String> accountHates = ["6", "7", "8", "9", "10"];
 
-      List<String> userLikes = ["1", "2", "3", "4", "5"];
-      List<String> userMustHaves = ["1", "2", "3"];
-      List<String> userHates = ["1", "2", "3", "4", "5"];
-      List<String> userMustNotHaves = ["a", "b", "c"];
+      List<DescriptionValue> userLikes = setupList(["1", "2", "3", "4", "5"]);
+      List<DescriptionValue> userMustHaves = setupList(["1", "2", "3"]);
+      List<DescriptionValue> userHates = setupList(["1", "2", "3", "4", "5"]);
+      List<DescriptionValue> userMustNotHaves = setupList(["a", "b", "c"]);
 
       Searcher searcher = Searcher();
 
@@ -340,13 +413,13 @@ void main() {
       List<String> accountHates = ["6", "7", "8", "9", "10"];
 
       //the user likes three things that the account likes
-      List<String> userLikes = ["6", "7", "3", "4", "5"];
+      List<DescriptionValue> userLikes = setupList(["6", "7", "3", "4", "5"]);
       //the user has one must have that account hates
-      List<String> userMustHaves = ["6", "2", "3"];
+      List<DescriptionValue> userMustHaves = setupList(["6", "2", "3"]);
       //The user has two hate that the user likes
-      List<String> userHates = ["1", "2", "8", "9", "10"];
+      List<DescriptionValue> userHates = setupList(["1", "2", "8", "9", "10"]);
       //user has one must not have which the account likes
-      List<String> userMustNotHaves = ["1", "b", "c"];
+      List<DescriptionValue> userMustNotHaves = setupList(["1", "b", "c"]);
 
       Searcher searcher = Searcher();
 
@@ -354,6 +427,126 @@ void main() {
           userLikes, userHates, userMustHaves, userMustNotHaves);
 
       expect(result, 47);
+
+    });
+
+    test("perfect match but is not matchable", (){
+
+      //in this test the expected result should be
+      int expected = 100;
+      //as everything should have a match however all the users
+      //information should be declared as unmatchable.
+      //in this test the algorithm should be able to match data considered unmatchable.
+
+      List<String> accountLikes = ["1", "2", "3", "4", "5"];
+      List<String> accountHates = ["6", "7", "8", "9", "10"];
+
+      List<DescriptionValue> userLikes = setupList(["1", "2", "3", "4", "5"]);
+      userLikes.forEach((element) {
+        element.matchable = 0;// i.e. false
+      });
+
+      List<DescriptionValue> userMustHaves = setupList(["1", "2", "3"]);
+      userMustHaves.forEach((element) {
+        element.matchable = 0; //i.e. false
+      });
+
+      List<DescriptionValue> userHates = setupList(["6", "7", "8", "9", "10"]);
+      userHates.forEach((element) {
+        element.matchable = 0;
+      });
+
+      List<DescriptionValue> userMustNotHaves = setupList(["a", "b", "c"]);
+      userMustNotHaves.forEach((element) {
+        element.matchable = 0;
+      });
+
+      Searcher searcher = Searcher();
+
+      int result = searcher.calculateMatchRate(accountLikes, accountHates,
+          userLikes, userHates, userMustHaves, userMustNotHaves);
+
+      expect(result, expected);
+
+    });
+
+    test("only one like and one hate value will be unmatchable", (){
+      //in this test the result should be
+      int expected = 95;
+      //as the test will have one like and one hate value that are marked as unmatchable
+      //the algorithm will not be able to find a match for the liked value but should not
+      //reduce the score since the liked value is unmatchable.
+
+      List<String> accountLikes = ["1", "2", "3", "4", "5"];
+      List<String> accountHates = ["6", "7", "8", "9", "10"];
+
+      List<DescriptionValue> userLikes = setupList(["1", "2", "3", "4", "5"]);
+      userLikes[0].name = "8"; //no possible match
+      userLikes[0].matchable = 0; //unmatchable
+
+      List<DescriptionValue> userMustHaves = setupList(["1", "2", "3"]);
+      userMustHaves.forEach((element) {
+        element.matchable = 0; //i.e. false
+      });
+
+      List<DescriptionValue> userHates = setupList(["6", "7", "8", "9", "10"]);
+      userHates[0].name = "1"; //no possible match
+      userHates[0].matchable = 0; //unmatchable
+
+      List<DescriptionValue> userMustNotHaves = setupList(["a", "b", "c"]);
+      userMustNotHaves.forEach((element) {
+        element.matchable = 0;
+      });
+
+      Searcher searcher = Searcher();
+
+      int result = searcher.calculateMatchRate(accountLikes, accountHates,
+          userLikes, userHates, userMustHaves, userMustNotHaves);
+
+      expect(result, expected);
+
+    });
+
+    test("no possible match but user values unmatchable", (){
+
+      //in this test the result should be
+      int expected = 100;
+      //as all the user's information is marked as unmatchable.
+      //The algorithm should ignore all values that are marked as unmatchable
+      //if no matches for these unmatchable values are found.
+      //This means that if all the user's values are unmatchable and no match
+      //for these values is found then the user's information should be ignored
+      //and should have the same affect of the user having no information
+
+      List<String> accountLikes = ["1", "2", "3", "4", "5"];
+      List<String> accountHates = ["6", "7", "8", "9", "10"];
+
+      List<DescriptionValue> userLikes = setupList(["a", "b", "c", "d", "e"]);
+      userLikes.forEach((element) {
+        element.matchable = 0;// i.e. false
+      });
+
+      List<DescriptionValue> userMustHaves = setupList(["n", "o", "p"]);
+      userMustHaves.forEach((element) {
+        element.matchable = 0; //i.e. false
+      });
+
+      List<DescriptionValue> userHates = setupList(["f", "g", "h", "i", "j"]);
+      userHates.forEach((element) {
+        element.matchable = 0;
+      });
+
+      List<DescriptionValue> userMustNotHaves = setupList(["k", "l", "m"]);
+      userMustNotHaves.forEach((element) {
+        element.matchable = 0;
+      });
+
+      Searcher searcher = Searcher();
+
+      int result = searcher.calculateMatchRate(accountLikes, accountHates,
+          userLikes, userHates, userMustHaves, userMustNotHaves);
+
+      expect(result, expected);
 
     });
 

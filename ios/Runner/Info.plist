@@ -29,6 +29,10 @@
 	<key>UISupportedInterfaceOrientations</key>
 	<key>NSLocationWhenInUseUsageDescription</key>
     <string>This app uses location to find people who are near to you.</string>
+    <key>NSPhotoLibraryUsageDescription</key>
+    <string>Save video in gallery</string>
+    <key>NSMicrophoneUsageDescription</key>
+    <string>Save audio in video</string>
 	<array>
 		<string>UIInterfaceOrientationPortrait</string>
 		<string>UIInterfaceOrientationLandscapeLeft</string>
@@ -43,5 +47,7 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
+	<key>GADApplicationIdentifier</key>
+    <string>ca-app-pub-6053844014996876~5085785151</string>
 </dict>
 </plist>

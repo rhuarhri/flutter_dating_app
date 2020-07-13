@@ -1,11 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutterdatingapp/database_management_code/database.dart';
-import 'package:flutterdatingapp/database_management_code/online_database.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
-import '../interests_screen.dart';
 import '../color_scheme.dart';
 import '../common_widgets.dart';
-import '../description_analyzer.dart';
 
 class DescriptionScreenWidgets
 {
@@ -32,6 +28,8 @@ int wordLimit = 1000; //characters
 //units of work is how google cloud measures price.
 
 int characterAmount = 0;
+
+
 
 class _DescriptionBody extends State<DescriptionBody>
 {
@@ -117,6 +115,10 @@ class _DescriptionBody extends State<DescriptionBody>
           shape: buttonBorderStyle,
           color: primary,
           onPressed: (){
+
+            setState(() {
+              isLoading = true;
+            });
 
           onCompleteAction.call();
 

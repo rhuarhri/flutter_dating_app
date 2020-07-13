@@ -22,13 +22,15 @@ class AddOnlineManager
       "age":age,
       "lat":lat,
       "long":long,
-      "gender":gender,
-      "lookingFor":lookingFor,
+      "gender":gender.toLowerCase(),
+      "lookingFor":lookingFor.toLowerCase(),
       "likes":[],
       "hates":[],
       "mustHaves":[],
       "mustNotHaves":[],
       "descriptionStyle":"",
+      "faceShape":"",
+      "lastUpdate": Timestamp.now(),
 
     }).then((value) => {
 
@@ -46,16 +48,17 @@ class AddOnlineManager
   {
     UserInfo userInfo = UserInfo();
     userInfo.onlineLocation = id;
-    userInfo.age = age;
-    userInfo.lookingFor = lookingFor;
+    userInfo.minAge = 18;
+    userInfo.maxAge = age + 5;
+    userInfo.lookingFor = lookingFor.toLowerCase();
     userInfo.descriptionStyle = "";
-    userInfo.latitude = latitude;
-    userInfo.longitude = longitude;
+    userInfo.distance = 100;
+    userInfo.accuracy = 50;
     DBProvider.db.addUser(userInfo);
   }
 
 
-  void addUserDescription(String userDescription) async
+  Future<bool> addUserDescription(String userDescription) async
   {
     UserInfo user = await DBProvider.db.getUser();
 
@@ -66,6 +69,9 @@ class AddOnlineManager
       _addDescription(value.documents[0].documentID, userInfoLocation, userDescription),
 
     });
+
+    bool isDone = true;
+    return isDone;
 
   }
 
@@ -87,7 +93,7 @@ class AddOnlineManager
     String userInfoLocation = user.onlineLocation;
     databaseReference.collection("users").document(userInfoLocation).updateData(
       {
-        "descriptionStyle":style,
+        "descriptionStyle":style.toLowerCase(),
       }
     );
   }
@@ -102,9 +108,14 @@ class AddOnlineManager
 
     StorageUploadTask upload = ref.putFile(image);
 
+    String imageLocation = "";
+    StorageReference imageRef;
 
-    upload.onComplete.then((value) => {
-      _recordImageLocation(value.uploadSessionUri, userId),
+    upload.onComplete.then((value) async => {
+
+      imageRef = FirebaseStorage.instance.ref().child(fileName),
+      imageLocation = await imageRef.getDownloadURL(),
+      _recordImageLocation(Uri.parse(imageLocation), userId),
     });
   }
 
@@ -119,8 +130,9 @@ class AddOnlineManager
     });
   }
 
-  void _updateImage(String location, String userId, String id)
+  void _updateImage(String location, String userId, String id) async
   {
+
     databaseReference.collection("users").document(userId).collection("basicInfo").document(id)
         .updateData(
         {
@@ -129,7 +141,20 @@ class AddOnlineManager
     );
   }
 
-  void addDescriptionValues(double dealBreakerFreshHold) async
+  void addFaceShape(String shape) async
+  {
+    UserInfo user = await DBProvider.db.getUser();
+    String userId = user.onlineLocation;
+
+    databaseReference.collection("users").document(userId).updateData(
+      {
+        "faceShape": shape,
+        "lastUpdate": Timestamp.now(),
+      }
+    );
+  }
+
+  Future<bool> addDescriptionValues(double dealBreakerFreshHold) async
   {
     print("deal breaker fresh hold is " + dealBreakerFreshHold.toString());
     List<DescriptionValue> hates = await DBProvider.db.getNegativeDescriptionValue(freshHold: (dealBreakerFreshHold - (dealBreakerFreshHold * 2)));
@@ -139,7 +164,9 @@ class AddOnlineManager
     if (hates.isEmpty == false)
       {
         hates.forEach((element) {
-          hatedItems.add(element.name);
+          //if (element.matchable == 1) {
+            hatedItems.add(element.name);
+          //}
         });
       }
 
@@ -183,7 +210,84 @@ class AddOnlineManager
           "hates":hatedItems,
           "mustHaves":mustHaveItems,
           "mustNotHaves":mustNotHaveItems,
+          "lastUpdate": Timestamp.now(),
         }
     );
+
+    bool isDone = true;
+    return isDone;
+
+  }
+
+  void addOneDescriptionValue(String name, double dealBreakerFreshHold) async
+  {
+    DescriptionValue newValue = await DBProvider.db.getOneDescriptionValue(name);
+
+    UserInfo user = await DBProvider.db.getUser();
+    String userId = user.onlineLocation;
+
+    if (newValue.sentiment > (dealBreakerFreshHold - (dealBreakerFreshHold * 2)) &&
+        newValue.sentiment < 0)
+      {
+        //if a hate value
+        DocumentSnapshot document = await databaseReference.collection("users").document(userId).get();
+
+        List<String> allHates = document.data["hates"];
+        allHates.add(newValue.name);
+
+        databaseReference.collection("users").document(userId).updateData(
+            {"hates":allHates, "lastUpdate": Timestamp.now(),});
+      }
+    else if (newValue.sentiment < (dealBreakerFreshHold - (dealBreakerFreshHold * 2)))
+    {
+      //if a must not have value
+      DocumentSnapshot document = await databaseReference.collection("users").document(userId).get();
+
+      List<String> allMustNotHaves = document.data["mustNotHaves"];
+      allMustNotHaves.add(newValue.name);
+      databaseReference.collection("users").document(userId).updateData(
+          {"mustNotHaves":allMustNotHaves, "lastUpdate": Timestamp.now(),});
+    }
+    else if (newValue.sentiment < dealBreakerFreshHold && newValue.sentiment > 0)
+      {
+        //if is a like value
+        DocumentSnapshot document = await databaseReference.collection("users").document(userId).get();
+
+        List<String> allLikes = document.data["likes"];
+        allLikes.add(newValue.name);
+        databaseReference.collection("users").document(userId).updateData(
+            {"likes":allLikes, "lastUpdate": Timestamp.now(),});
+      }
+    else if (newValue.sentiment > dealBreakerFreshHold)
+      {
+        //if is a must have value
+        DocumentSnapshot document = await databaseReference.collection("users").document(userId).get();
+
+        List<String> allMustHaves = document.data["mustHaves"];
+        allMustHaves.add(newValue.name);
+        databaseReference.collection("users").document(userId).updateData(
+            {"mustHaves":allMustHaves, "lastUpdate": Timestamp.now(),});
+      }
+  }
+  
+  void addUserInterest(String name, bool isLiked)
+  {
+    int liked = 0;
+    int hated = 0;
+    
+    if (isLiked == true)
+      {
+        liked++;
+      }
+    else
+      {
+        hated++;
+      }
+    
+    databaseReference.collection("interests").add({
+      "name":name,
+      "likes":liked,
+      "hates":hated,
+    });
   }
 }

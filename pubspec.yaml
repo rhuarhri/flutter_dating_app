@@ -33,6 +33,7 @@ dependencies:
   cloud_firestore:
   firebase_storage:
   firebase_auth:
+  firebase_admob:
   google_sign_in:
   image_picker:
   sqflite:
@@ -43,6 +44,20 @@ dependencies:
 
   googleapis_beta:
   googleapis_auth:
+
+  network_to_file_image:
+  cached_network_image:
+
+  firebase_ml_vision: ^0.9.4
+
+  flutter_tts: 1.2.3
+
+  ads:
+
+  # for testing
+  flutter_screen_recording:
+  permission_handler:
+
 
 
 dev_dependencies:

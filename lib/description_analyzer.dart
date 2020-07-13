@@ -1,4 +1,3 @@
-//import 'package:flutter_ibm_watson/flutter_ibm_watson.dart';
 import 'package:flutter/material.dart';
 
 import 'package:flutter/cupertino.dart';
@@ -9,15 +8,6 @@ import 'database_management_code/database.dart';
 import 'database_management_code/internal/DataModels.dart';
 
 import './ApiKeys.dart';
-
-/*
-Test description
-I am a currently studying mobile app development. A part from that I go caving at the weekends.
-I enjoy caving as I see place few people ever see as well as the challenge of caving.
-I regularly go running mainly to keep fit. I don't like children as they can be annoying at times.
-I also get annoyed at plot holes in TV programs.
-
- */
 
 
 String apiKey = NLPkey;
@@ -100,12 +90,8 @@ class DescriptionAnalyzer
     return result;
   }
 
-  //int mistakes = 0;
-  //int abbreviation = 0;
-  //int punctuation = 0;
 
-
-  analyze(String description, BuildContext context) async
+  Future<bool> analyze(String description, BuildContext context) async
   {
 
 
@@ -117,26 +103,16 @@ class DescriptionAnalyzer
 
     print("the users language is " + language);
 
-    //String content = "I enjoy flutter";
-
     Document input = Document();
     input.content = description;
     input.language = language;
     input.type = "PLAIN_TEXT";
 
     AnalyzeEntitySentimentRequest request = AnalyzeEntitySentimentRequest();
-    //request.document.content = content;
-    //request.document.language = "EN";
-    //request.document.type = "PLAIN_TEXT";
 
     request.document = input;
 
-    //String name = "";
-    //double likes = 0.0;
-    //String result = "The entity is ";
-
     print("Sending document with content of " + input.content);
-
     
     List<AnalyzeEntitySentimentResponse> data =
     await langAPI.documents.analyzeEntitySentiment(request).asStream().toList();
@@ -155,17 +131,16 @@ class DescriptionAnalyzer
             print("The entity is " + element.name + " and it liked this much " + element.sentiment.score.toStringAsFixed(3));
 
             DescriptionValue value = DescriptionValue();
-            value.name = element.name;
+            value.name = element.name.toLowerCase();
             value.sentiment = element.sentiment.score;
+            value.matchable = 1;
 
-            DBProvider.db.addDescriptionValue(value);
+            DBProvider.db.userAddDescriptionValue(value);
 
           });
 
         });
 
-        //Navigator.push(context, MaterialPageRoute(builder: (context) => InterestsScreen()));
-        
       }
 
     int abbreviation = 0;
@@ -179,9 +154,6 @@ class DescriptionAnalyzer
         await langAPI.documents.analyzeSyntax(syntaxRequest);
 
     syntaxData.tokens.forEach((element) {
-      /*String word = element.text.content;
-      String label = element.dependencyEdge.label;
-      String type = element.partOfSpeech.tag;*/
 
       if (element.dependencyEdge.label == "ABBREV")
         {
@@ -212,37 +184,6 @@ class DescriptionAnalyzer
     descriptionStyle = analyzeDescriptionStyle(mistakes, abbreviation, punctuation, description, maxDescriptionLength);
 
     DBProvider.db.updateDescriptionStyle(descriptionStyle);
-
-
-
-    /*
-    then((value) => {
-
-      if (
-      value.entities.isEmpty)
-        {
-          print("No result received"),
-        }
-      else
-        {
-
-          value.entities.map((e) =>
-          {
-
-            print(e.name),
-            name = e.name,
-            likes = e.sentiment.score,
-            result = "" + name + " and the like value is " +
-                likes.toStringAsFixed(3) + "",
-
-          })
-        }
-    }).whenComplete(() => {
-      print("name is " + name),
-      print(result),
-      print("completed"),
-    });*/
-
 
 
   }

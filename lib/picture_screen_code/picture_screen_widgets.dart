@@ -45,8 +45,7 @@ class _PictureScreenBody extends State<PictureScreenBody> {
 
         children: <Widget>[
           Flexible(child:
-          Container(child: showImage(), //Text("image"),
-            //color: Colors.green,
+          Container(child: showImage(),
           ),
             fit: FlexFit.tight,
             flex: 7,
@@ -57,7 +56,6 @@ class _PictureScreenBody extends State<PictureScreenBody> {
           helpButtons("Press get image and pick a image from your gallery",
               "Make sure that you are in the centre of the image",
               context),
-            //color: Colors.yellow,
           ),
             fit: FlexFit.tight,
             flex: 1,
@@ -82,16 +80,12 @@ class _PictureScreenBody extends State<PictureScreenBody> {
           ],
             mainAxisAlignment: MainAxisAlignment.spaceAround,
           ),
-            //color: Colors.blue,
           ),
             fit: FlexFit.tight,
             flex: 2,
           ),
         ],);
   }
-
-
-
 
   void pickImageFromGallery(ImageSource source)
   {

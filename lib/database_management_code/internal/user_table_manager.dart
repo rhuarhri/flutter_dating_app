@@ -27,28 +27,52 @@ class GetFromUser
 class UpdateToUser
 {
 
+    updateUserFaceShape(Database db, String shape) async
+    {
+      UserInfo existingUser = await GetFromUser().getUser(db);
+      existingUser.faceShape = shape;
+      updateUser(db, existingUser);
+    }
+
     updateUserDescriptionStyle(Database db, String newStyle) async
     {
       UserInfo existingUser = await GetFromUser().getUser(db);
 
       existingUser.descriptionStyle = newStyle;
 
-      _updateUser(db, existingUser);
+      updateUser(db, existingUser);
     }
 
-    updateUserLocation(Database db, lat, long) async
+    updateUserDistance(Database db, double distance) async
     {
       UserInfo existingUser = await GetFromUser().getUser(db);
 
-      existingUser.latitude = lat;
-      existingUser.longitude = long;
+      existingUser.distance = distance;
 
-      _updateUser(db, existingUser);
-
+      updateUser(db, existingUser);
 
     }
 
-    _updateUser(Database db, UserInfo newUserInfo)
+    updateUserAgeRange(Database db, int minAge, int maxAge) async
+    {
+      UserInfo existingUser = await GetFromUser().getUser(db);
+
+      existingUser.minAge = minAge;
+      existingUser.maxAge = maxAge;
+
+      updateUser(db, existingUser);
+    }
+
+    updateUserAccuracy(Database db, int accuracy) async
+    {
+      UserInfo existingUser = await GetFromUser().getUser(db);
+
+      existingUser.accuracy = accuracy;
+
+      updateUser(db, existingUser);
+    }
+
+    updateUser(Database db, UserInfo newUserInfo)
     {
       db.update("UserInfo", newUserInfo.toMap(), where: "id = ?", whereArgs: [newUserInfo.id]);
     }
@@ -56,5 +80,12 @@ class UpdateToUser
 
 class DeleteFromUser
 {
+  void deleteUser(Database db) async
+  {
+    UserInfo existingUser = await GetFromUser().getUser(db);
 
+    //db.delete("UserInfo", where: "id = ?", whereArgs: [existingUser.id]);
+    db.delete("UserInfo");
+
+  }
 }

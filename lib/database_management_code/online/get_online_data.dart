@@ -1,5 +1,4 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutterdatingapp/database_management_code/internal/DataModels.dart';
 
 import '../database.dart';
@@ -25,11 +24,8 @@ class GetOnlineManager
 
     List<DocumentSnapshot> searchResults = [];
 
-    query.getDocuments().then((value) => {
-
-      searchResults = value.documents,
-
-    });
+    QuerySnapshot value = await query.getDocuments();
+    searchResults = value.documents;
 
     return searchResults;
 
@@ -53,9 +49,12 @@ class GetOnlineManager
   {
     var foundData = await DBProvider.db.getUser();
 
+    Query newQuery = databaseReference.collection("users");
+    Query oldQuery;
+
     UserInfo user = foundData;
-    _getAgeRange(user.age);
-    _getLocationRange(user.latitude, user.longitude);
+    print("user age is " + user.minAge.toString());
+    print("user looking for " + user.lookingFor.toLowerCase());
 
     List<DescriptionValue> userLikedItem = await DBProvider.db
         .getMustHaveDescriptionValue(searchFreshHold);
@@ -64,68 +63,63 @@ class GetOnlineManager
 
     //firestore's array contains query can only accept up to 10 items
     //as result the u=number of the user's likes is limited here.
-    for (int i = 0; i < 10 || i < userLikedItem.length; i++) {
-      searchForLiked.add(userLikedItem[i].name);
+    if (userLikedItem.isNotEmpty == true) {
+      for (int i = 0; i < 10 || i < userLikedItem.length; i++) {
+        searchForLiked.add(userLikedItem[i].name);
+      }
+
+      //TODO uncomment in the future. But it is too unlikely that any match will be found.
+      // However it may be wise no to since the search algorithm will handle it
+      //query.where("likes", arrayContainsAny: searchForLiked);
     }
 
-    var query = databaseReference.collection("users").
-    where("age", isGreaterThanOrEqualTo: _MinAge).
-    where("age", isLessThanOrEqualTo: _MaxAge).
-    where("lat", isGreaterThanOrEqualTo: _minLat).
-    where("lat", isLessThanOrEqualTo: _maxLat).
-    where("long", isGreaterThanOrEqualTo: _minLong).
-    where("long", isLessThanOrEqualTo: _maxLong).
-    where("gender", isEqualTo: user.lookingFor)
 
-        .where("interests", arrayContainsAny: searchForLiked)
+    /*The query is coded like this because of the reason explained here
+  https://stackoverflow.com/questions/50316462/flutter-firestore-compound-query*/
 
-        .orderBy("age")
+    oldQuery = databaseReference.collection("users");
+    newQuery = oldQuery.where("age", isGreaterThanOrEqualTo: user.minAge);
+    oldQuery = newQuery;
+    newQuery = oldQuery.where("gender", isEqualTo: user.lookingFor.toLowerCase());
+    oldQuery = newQuery;
+    newQuery = oldQuery.where("age", isLessThanOrEqualTo: user.maxAge);
+    oldQuery = newQuery;
+    //Get all accounts that were active in the past 30 days.
+    //accounts that were not active in that time are considered not using the app
+    DateTime inactivityLimit = DateTime.now().subtract(Duration(days: 30));
+    newQuery = oldQuery.where("lastUpdate", isGreaterThanOrEqualTo: Timestamp.fromDate(inactivityLimit));
+    newQuery = oldQuery.orderBy("age");
+    oldQuery = newQuery;
+    newQuery = oldQuery.limit(50);
 
-        .limit(50);
+    return newQuery;
+  }
+  
+  Future<DocumentSnapshot> getUserDescription(String id) async
+  {
+    DocumentSnapshot result;
+    QuerySnapshot foundData = await databaseReference.collection("users").document(id)
+        .collection("basicInfo").getDocuments();
 
-    return query;
+    result = foundData.documents[0];
+
+    return result;
   }
 
-  int _MaxAge = 0;
-  int _MinAge = 0;
-  void _getAgeRange(int age)
+  Future<List<String>> getMatchedUsers() async
   {
-    //TODO Find a better way to calculate age range
+    var foundData = await DBProvider.db.getUser();
 
-    _MaxAge = age + 5;
-    _MinAge = age - 5;
-    if (_MinAge < 18)
-    {
-      _MinAge = 18;
-    }
-  }
+    QuerySnapshot matchedUser = await databaseReference.collection("users").document(foundData.onlineLocation)
+    .collection("matches").getDocuments();
 
-  int _minLat = 0;
-  int _maxLat = 0;
-  int _minLong = 0;
-  int _maxLong = 0;
-  //The location is a double but these aren't as there is no benefit from them
-  //being accurate i.e. accurate but not 0.01 level accurate.
-  void _getLocationRange(double userLat, double userLong) async
-  {
-    //TODO research how far people will go for love as 120 miles might be too far
+    List<String> result = [];
 
-    /*
-    user some not see anyone who is greater than 1.5 degrees greater than the lat and long on their
-    location. As 1.5 degree difference is 194 km or 120 miles.*/
+    matchedUser.documents.forEach((element) {
+      result.add(element.data["accountId"].toString());
+    });
 
-    double difference = 1.5;
-
-    //Position userPosition = await LocationManager().getCurrentLocation();
-
-    double lat = userLat;
-    double long = userLong;
-
-    _minLat = (lat - difference).round();
-    _maxLat = (lat + difference).round();
-    _minLong = (long - difference).round();
-    _maxLong = (long + difference).round();
-
+    return result;
   }
 
 }

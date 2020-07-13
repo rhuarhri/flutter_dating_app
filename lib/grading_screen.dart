@@ -1,28 +1,21 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:flutterdatingapp/account_screen_code/account_screen.dart';
 import 'package:flutterdatingapp/account_screen_code/account_update_screen.dart';
-import 'package:flutterdatingapp/description_analyzer.dart';
 import 'package:flutterdatingapp/description_screen_code/description_update_screen.dart';
 import 'package:flutterdatingapp/picture_screen_code/picture_update_screen.dart';
+import 'package:flutterdatingapp/search_manager.dart';
+import 'package:flutterdatingapp/setting_screen.dart';
+import 'package:flutterdatingapp/text_reader.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import './color_scheme.dart';
 import './common_widgets.dart';
-import 'database_management_code/database.dart';
-import 'database_management_code/internal/DataModels.dart';
-
-class TestAccount
-{
-  TestAccount(this.name, this.description, this.image, this.location, this.age);
-
-  String name = "";
-  String description = "";
-  int location = 0;
-  int age = 0;
-  String image = "";
-}
+import './chat_screen.dart';
+import 'match_manager.dart';
 
 //TODO add a star grading widget under the image just above the description
 //This will allow the user to grade the account as they are looking at it.
+
+int _currentGrade = 0;
 
 class GradingScreen extends StatelessWidget {
 
@@ -30,9 +23,6 @@ class GradingScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return GradingPage();
   }
-
-
-
 }
 
 class StarGrading extends StatefulWidget
@@ -47,8 +37,6 @@ class StarGrading extends StatefulWidget
 class _StartGrading extends State<StarGrading>
 {
 
-  int value = 0;
-
   @override
   Widget build(BuildContext context) {
     return
@@ -58,24 +46,24 @@ class _StartGrading extends State<StarGrading>
       children: List.generate(5, (index) {
         return
             IconButton(icon: Icon(
-              index < value ? MdiIcons.star : MdiIcons.starOutline,
+              index < _currentGrade ? MdiIcons.star : MdiIcons.starOutline,
               color: primaryDark,
             ),
               onPressed: (){
               int location = index +1;
               //location of star pressed
 
-              if (location == value)
+              if (location == _currentGrade)
                 {
                   setState(() {
-                    value = location - 1;
+                    _currentGrade = location - 1;
                     //if full make it empty i.e. decrease value
                   });
                 }
               else
                 {
                   setState(() {
-                    value = location;
+                    _currentGrade = location;
                     //if empty make full i.e. increase value
                   });
                 }
@@ -104,44 +92,7 @@ class GradingPage extends StatefulWidget
 class _GradingPage extends State<GradingPage>
 {
 
-  List<TestAccount> accounts = [
-    TestAccount("Fred Johnson",
-        "I go hiking",
-        "assets/place_holder_person_1.jpeg",
-        26,
-        32
-    ),
-    TestAccount("Hannah Harrison",
-        "I go swimming",
-        "assets/place_holder_person_2.jpeg",
-        40,
-        29
-    ),
-    TestAccount("Beth Smith",
-        "I go running",
-        "assets/place_holder_person_3.jpeg",
-        11,
-        25
-    ),
-    TestAccount("Fred Johnson",
-        "I go hiking",
-        "assets/place_holder_person_1.jpeg",
-        26,
-        32
-    ),
-    TestAccount("Hannah Harrison",
-        "I go swimming",
-        "assets/place_holder_person_2.jpeg",
-        40,
-        29
-    ),
-    TestAccount("Beth Smith",
-        "I go running",
-        "assets/place_holder_person_3.jpeg",
-        11,
-        25
-    )
-  ];
+  List<AccountInfo> accounts = [];
 
   //The user will only have access to three options
   int optionOneLoc = 0;
@@ -150,13 +101,97 @@ class _GradingPage extends State<GradingPage>
 
   int displayedOption = 0;
 
+  AccountInfo getAccount(int index)
+  {
+    if (accounts.length <= 0 || accounts.length <= index)
+      {
+        return AccountInfo.createAccountInfo("", "No account found",
+            "There are no more accounts available at the moment.",
+            "https://firebasestorage.googleapis.com/v0/b/grading-dating-app.appspot.com/o/error-image.png?alt=media&token=3ab22d8d-334f-420a-80dc-4dd13ad362be",
+            0, 0);
+      }
+    else
+      {
+        return accounts[index];
+      }
+
+  }
+
+  Widget getImage(String location)
+  {
+    if (location == "")
+      {
+        return CircularProgressIndicator();
+      }
+    else
+      {
+        return
+          CachedNetworkImage(
+            imageUrl: location,
+            placeholder: (context, url) => CircularProgressIndicator(),
+            errorWidget: (context, url, error) => Icon(MdiIcons.alertCircle),
+          );
+      }
+  }
+
+  Widget getImageAvatar(String location)
+  {
+    if (location == "")
+    {
+      return CircularProgressIndicator();
+    }
+    else
+    {
+      return
+        CachedNetworkImage(
+          imageUrl: location,
+          placeholder: (context, url) => CircularProgressIndicator(),
+          errorWidget: (context, url, error) => Icon(MdiIcons.alertCircle),
+        );
+
+    }
+  }
+
+  bool isSetupRequired = true;
+
   @override
   Widget build(BuildContext context) {
+
+    if (isSetupRequired == true)
+      {
+        setup();
+        isSetupRequired = false;
+      }
+
     return Scaffold(
       drawer: gradingMenu(),
       body: gradingBody(context),
       bottomNavigationBar: footer(),
+      floatingActionButton: actionBTN(context),
     );
+  }
+
+  bool audioPlaying = false;
+  Widget actionBTN(BuildContext context)
+  {
+    Widget icon = audioPlaying == false ? Icon(MdiIcons.volumeHigh) : Icon(MdiIcons.volumeOff);
+
+    return FloatingActionButton(backgroundColor: secondary, child: icon, onPressed: (){
+
+      TextToSpeech textToSpeech = TextToSpeech();
+      if (audioPlaying == false) {
+        textToSpeech.readText(getAccount(displayedOption).description, context);
+      }
+      else
+        {
+          textToSpeech.stopReading();
+        }
+
+      setState(() {
+        audioPlaying = !audioPlaying;
+      });
+
+    },);
   }
 
   Widget gradingBody(BuildContext context) {
@@ -166,13 +201,18 @@ class _GradingPage extends State<GradingPage>
           slivers: <Widget>[
 
             SliverAppBar(
-              title: Text(accounts[displayedOption].name),
+              title: Text(getAccount(displayedOption).name),
               actions: [
                 IconButton(
                     icon: Icon(
                       MdiIcons.chat,
-                      color: Colors.black,
-                    ))
+                      color: secondary,
+                    ),
+                  onPressed: (){
+                    Navigator.push(
+                        context, MaterialPageRoute(builder: (context) => ChatScreen()));
+                  },
+                ),
               ],
 
               backgroundColor: primary,
@@ -183,8 +223,7 @@ class _GradingPage extends State<GradingPage>
               //80% screen height
 
               flexibleSpace: FlexibleSpaceBar(
-                background: Image.asset(accounts[displayedOption].image,
-                    fit: BoxFit.contain),
+                background: getImage(getAccount(displayedOption).imageLocation),
               ),
             ),
             SliverFixedExtentList(
@@ -196,10 +235,10 @@ class _GradingPage extends State<GradingPage>
                 [
                   Container(
                       child: Column(children: <Widget>[
-                        Text(accounts[displayedOption].name),//Name
-                        Text(accounts[displayedOption].age.toString()),//age
-                        Text(accounts[displayedOption].location.toString()),//location
-                        Text(accounts[displayedOption].description)//description
+                        Text(getAccount(displayedOption).name),//Name
+                        Text(getAccount(displayedOption).age.toString()),//age
+                        Text(getAccount(displayedOption).distance.toString()),//location
+                        Text(getAccount(displayedOption).description)//description
                       ],),
                       color: Colors.white
                   ),
@@ -220,7 +259,9 @@ class _GradingPage extends State<GradingPage>
           ],),
           color: primary,),
         onDismissed: (direction) {
-          gradingPopup(context);
+          if (getAccount(displayedOption).accountId != "") {
+            gradingPopup(context);
+          }
         },
       );
   }
@@ -231,15 +272,22 @@ class _GradingPage extends State<GradingPage>
       child: ListView(
         children: <Widget>[
           drawerHeader(),
-          RaisedButton(child:
+          FlatButton(
+            color: primary,
+            child:
           Row(children: <Widget>[
             Icon(MdiIcons.chat),
             Text("Chats")
           ],),
-            onPressed: () {},
+            onPressed: () {
+              Navigator.push(
+                  context, MaterialPageRoute(builder: (context) => ChatScreen()));
+            },
           ),
 
-          RaisedButton(child:
+          FlatButton(
+            color: primary,
+            child:
           Row(children: <Widget>[
             Icon(MdiIcons.account),
             Text("Account")
@@ -250,7 +298,9 @@ class _GradingPage extends State<GradingPage>
             },
           ),
 
-          RaisedButton(child:
+          FlatButton(
+            color: primary,
+            child:
           Row(children: <Widget>[
             Icon(MdiIcons.imageSizeSelectActual),
             Text("image")
@@ -261,7 +311,9 @@ class _GradingPage extends State<GradingPage>
             },
           ),
 
-          RaisedButton(child:
+          FlatButton(
+            color: primary,
+            child:
           Row(children: <Widget>[
             Icon(MdiIcons.cardText),
             Text("Description")
@@ -269,6 +321,19 @@ class _GradingPage extends State<GradingPage>
             onPressed: () {
               Navigator.push(
                   context, MaterialPageRoute(builder: (context) => DescriptionUpdateScreen()));
+            },
+          ),
+
+          FlatButton(
+            color: primary,
+            child:
+          Row(children: <Widget>[
+            Icon(MdiIcons.cog),
+            Text("Settings")
+          ],),
+            onPressed: () {
+              Navigator.push(
+                  context, MaterialPageRoute(builder: (context) => SettingScreen()));
             },
           ),
 
@@ -304,7 +369,15 @@ class _GradingPage extends State<GradingPage>
             onPressed: (){popup("Help", helpContent, context, (){});},),
 
           FlatButton(child: Text("Done"), onPressed: () {
-            //TODO save grading value here
+
+            MatchManager().addMatch(getAccount(displayedOption).name, getAccount(displayedOption).imageLocation,
+                getAccount(displayedOption).description, getAccount(displayedOption).accountId, _currentGrade);
+
+            if(accounts.length < 3)
+              {
+                //TODO get more accounts
+              }
+
             setState(() {
               accounts.removeAt(displayedOption);
             });
@@ -319,10 +392,9 @@ class _GradingPage extends State<GradingPage>
 
   Widget imageButton(String imageLocation, Function action) {
     return Flexible(child: RaisedButton(
-      child: Image.asset(
-        imageLocation, height: 70.0, width: 90.0, fit: BoxFit.cover,),
+      child: getImageAvatar(imageLocation),
       onPressed: action,
-      color: primaryDark,
+      color: secondaryDark,
     ),
       fit: FlexFit.loose,
       flex: 1,
@@ -331,34 +403,61 @@ class _GradingPage extends State<GradingPage>
 
   Widget footer() {
     return Container(child: Row(children: <Widget>[
-      imageButton(accounts[optionOneLoc].image, () {
-        DescriptionAnalyzer analyzer = DescriptionAnalyzer();
-        analyzer.analyze("omg you look so cool fam.", context);
+      imageButton(getAccount(optionOneLoc).imageLocation, () {
+        displayedOption = optionOneLoc;
+        setState(() {
+
+        });
+      }),
+      imageButton(getAccount(optionTwoLoc).imageLocation, () {
+        displayedOption = optionTwoLoc;
+        setState(() {
+
+        });
 
       }),
-      imageButton(accounts[optionTwoLoc].image, () {
-        //databaseTest();
-      }),
-      imageButton(accounts[optionThreeLoc].image, () {})
+      imageButton(getAccount(optionThreeLoc).imageLocation, () {
+        displayedOption = optionThreeLoc;
+        setState(() {
+
+        });
+      })
     ],
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
     ), height: 80, color: primaryLight,);
   }
 
+  void setup() async
+  {
+    Searcher searchManager = Searcher();
+
+    List<AccountInfo> foundAccounts = await searchManager.search();
+    print("search result length is " + foundAccounts.length.toString());
+
+    accounts.addAll(foundAccounts);
+
+    setState(() {
+
+    });
+  }
+
   void databaseTest() async
   {
-    List<DescriptionValue> result = await DBProvider.db.getNegativeDescriptionValue();
 
-    if (result.isEmpty == true)
+    MatchManager matchManager = MatchManager();
+
+    List<MatchInfo> result = await matchManager.getMatches();
+
+    if (result.isEmpty)
       {
-        print("no hates found");
+        print("no matches found");
       }
-    else
-      {
-        result.forEach((element) {
-          print("hate is " + element.name);
-        });
-      }
+
+    result.forEach((element) {
+      print("name is " + element.name);
+    });
+
+
   }
 
 }

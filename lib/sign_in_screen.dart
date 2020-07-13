@@ -1,18 +1,37 @@
 import 'package:flutter/material.dart';
+import 'package:flutterdatingapp/authentication_manager.dart';
+import 'package:flutterdatingapp/common_widgets.dart';
+import 'package:flutterdatingapp/screen_recorder.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'account_screen_code/account_screen.dart';
 import './color_scheme.dart';
-import './sign_in_handler.dart';
 import './grading_screen.dart';
 
 class SignInScreen extends StatelessWidget{
 
-  bool isSignIn = true;
+  bool isSignIn = false;
+  bool isSetupRequired = true;
+  bool checkingLogin = true;
+  AuthManager signUpManager = AuthManager();
 
   final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
 
   @override
   Widget build(BuildContext context) {
+
+    signUpManager.getIsSetupRequired().then((value) =>
+        {
+          isSetupRequired = value,
+        }
+    );
+
+    signUpManager.isSignIn().then((value) =>
+    {
+      isSignIn = value,
+      checkingLogin = false,
+    }
+    );
+
     return Scaffold(
       key: scaffoldKey,
       appBar: signInAppBar(), body: signInBody(context),
@@ -30,11 +49,6 @@ class SignInScreen extends StatelessWidget{
 
   Widget signInBody(BuildContext context) {
 
-
-    if(isSignIn == false) {
-      //_signInActionsDisplay(context);
-    }
-
     return
       Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -51,77 +65,25 @@ class SignInScreen extends StatelessWidget{
           )
           ),
 
-
-          /*Expanded(child:
-          Container(
-            //color: Colors.blue,
-            child:
-            Column(
-              children: <Widget>[
-
-                IntrinsicWidth( //This ensures that all widgets are the same size as the largest widget
-                  child: Column(
-                    children: <Widget>[
-
-                      RaisedButton(child: Text("Terms and conditions", textScaleFactor: 1.2,), onPressed: (){
-                          showTerms(context);
-                      },
-                        shape: buttonBorderStyle,
-                        color: primary,
-                      ),
-
-                      RaisedButton(child:
-                      Row(children: <Widget>[
-                        Icon(MdiIcons.google, size: 40,),
-                        Text("Sign in with Google", textScaleFactor: 1.2,)
-                      ],
-                        //mainAxisAlignment: MainAxisAlignment.start,
-                      ),
-                        shape: buttonBorderStyle,
-                        color: primary,
-                        onPressed: () {
-                        signInWithGoogle();
-                        },),
-
-
-                      RaisedButton(child:
-                      Row(children: <Widget>[
-                        Icon(MdiIcons.facebook, size: 40,),
-                        Text("Sign in with Facebook", textScaleFactor: 1.2,)
-                      ],
-                        //mainAxisAlignment: MainAxisAlignment.start,
-                      ),
-                        shape: buttonBorderStyle,
-                        color: primary,
-                        onPressed: () {},),
-
-
-                      RaisedButton(child:
-                      Row(children: <Widget>[
-                        Icon(MdiIcons.email, size: 40,),
-                        Text("Sign in with email", textScaleFactor: 1.2,)
-                      ],
-                        //mainAxisAlignment: MainAxisAlignment.start,
-                      ),
-                        shape: buttonBorderStyle,
-                        color: primary,
-                        onPressed: () {toNewScreen(context);},),
-                    ],
-                  ),
-                )
-              ],
-              mainAxisAlignment: MainAxisAlignment.end,
-            ),
-          )
-          ),*/
         ],
       );
   }
 
 
-  void toNewScreen(context)
+  void toAccountScreen(BuildContext context)
   {
+    Recorder().start();
+
     Navigator.push(context, MaterialPageRoute(builder: (context) => AccountAddScreen()));
+  }
+
+  void toGradingScreen(BuildContext context)
+  {
+    Recorder().start();
+
+    Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => GradingScreen()));
   }
 
   void showTerms(BuildContext context)
@@ -140,44 +102,46 @@ class SignInScreen extends StatelessWidget{
   {
 
     IconData icon;
-    //Function action = (){};
 
-    if (isSignIn == true)
+    if (isSetupRequired == false && isSignIn == true)
       {
         icon = MdiIcons.arrowRight;
-        /*action = (context) {
-
-        };*/
-
       }
     else
       {
         icon = MdiIcons.login;
-        //action = (){};
-        /*action = (context) {
-          //_signInActionsDisplay(context);
-        };*/
       }
 
-    return FloatingActionButton(child:
-    Icon(icon, color: Colors.black, size: 36,), onPressed: ()
+    return FloatingActionButton(
+      child:
+    Icon(icon, color: Colors.white, size: 36,), onPressed: ()
       {
-        if(isSignIn == false)
-          {
+
+        if(checkingLogin == false) {
+          if (isSetupRequired == true || isSignIn == false) {
             _signInActionsDisplay(context);
-          }
-        else {
-          Navigator.push(
-              context, MaterialPageRoute(builder: (context) => GradingScreen()));
         }
+        else {
+         toGradingScreen(context);
+        }
+
+      }
+        else {
+          popup("Checking",
+              "Currently checking if you have already setup an account. This should only take a few seconds.",
+              context, () {}
+          );
+        }
+
+        Recorder().showStartRecordingAlert(context);
       },
-      backgroundColor: primary,);
+      backgroundColor: secondary,);
   }
 
   void _signInActionsDisplay(BuildContext context)
   {
-    scaffoldKey.currentState.showBottomSheet((context) =>
 
+    scaffoldKey.currentState.showBottomSheet((context) =>
         Container(
           height: MediaQuery.of(context).size.height * .60,
 
@@ -194,7 +158,7 @@ class SignInScreen extends StatelessWidget{
                   color: primary,
                 ),
                 fit: FlexFit.tight,
-                flex: 2,
+                flex: 3,
                 ),
                 Spacer(flex: 1,)
               ],
@@ -214,10 +178,10 @@ class SignInScreen extends StatelessWidget{
                     shape: buttonBorderStyle,
                     color: primary,
                     onPressed: () {
-                      signInWithGoogle();
+                      signUpManager.signInWithGoogle(context);
                     },),
                   fit: FlexFit.tight,
-                  flex: 2,
+                  flex: 3,
                 ),
                 Spacer(flex: 1,)
               ],
@@ -232,13 +196,15 @@ class SignInScreen extends StatelessWidget{
                     Icon(MdiIcons.facebook, size: 40,),
                     Text("Sign in with Facebook", textScaleFactor: 1.2,)
                   ],
-                    //mainAxisAlignment: MainAxisAlignment.start,
                   ),
                     shape: buttonBorderStyle,
                     color: primary,
-                    onPressed: () {},),
+                    onPressed: () {
+                    signUpManager.signInWithFacebook(context);
+                  }
+                  ,),
                   fit: FlexFit.tight,
-                  flex: 2,
+                  flex: 3,
                 ),
                 Spacer(flex: 1,)
               ], mainAxisAlignment: MainAxisAlignment.center,),
@@ -255,34 +221,93 @@ class SignInScreen extends StatelessWidget{
                   ),
                     shape: buttonBorderStyle,
                     color: primary,
-                    onPressed: () {toNewScreen(context);},),
+                    onPressed: () {
+
+                      emailSignInPopup(context);
+
+                    },),
                   fit: FlexFit.tight,
-                  flex: 2,
+                  flex: 3,
                 ),
                 Spacer(flex: 1,)
               ], mainAxisAlignment: MainAxisAlignment.center,),
 
-              /*IntrinsicWidth(//This ensures that all widgets are the same size as the largest widget
-                child: Column(
-                  children: <Widget>[
-
-
-
-
-
-
-
-
-
-
-              )*/
             ],
             mainAxisAlignment: MainAxisAlignment.end,
             crossAxisAlignment: CrossAxisAlignment.stretch,
           ),)
     );
-    //});
   }
+
+  void emailSignInPopup(BuildContext context)
+  {
+    showDialog(context: context, builder: (context){
+
+      TextEditingController emailController = TextEditingController();
+      TextEditingController passwordController = TextEditingController();
+
+      return AlertDialog(
+        title: Text("sign in with email"),
+        content: Container(
+          height: 100,
+          child: Column(
+            children: [
+              Flexible(child:
+              TextField(
+                  controller: emailController,
+                  decoration: InputDecoration(
+                      border: InputBorder.none,
+                      hintText: "email"
+                  )
+              ),
+                fit: FlexFit.tight,
+                flex: 1,
+              ),
+
+              Flexible(child:
+              TextField(
+                  controller: passwordController,
+                  decoration: InputDecoration(
+                      border: InputBorder.none,
+                      hintText: "password"
+                  )
+              ),
+                fit: FlexFit.tight,
+                flex: 1,
+              ),
+            ],),),
+        actions: [
+          FlatButton( child: Text("Sign in"), onPressed: () {
+            signUpManager.signInWithEmail(emailController.text, passwordController.text).then((value) =>
+                {
+                  if (value != "")
+                    {
+                        errorPopup("Unable to sign up make sure email and password are correct.", context),
+                    }
+                  else
+                    {
+                      if (isSetupRequired == true)
+                        {
+                          toAccountScreen(context),
+                        }
+                      else
+                        {
+                          toGradingScreen(context),
+                        }
+                    }
+                }
+
+            );
+
+          }, )
+        ],
+        shape: buttonBorderStyle,
+      );
+    }
+    );
+
+    }
+
 
 }
 
