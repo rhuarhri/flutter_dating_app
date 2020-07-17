@@ -358,7 +358,7 @@ class _GradingPage extends State<GradingPage>
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: <Widget>[
-        Text("App name",)
+        Text(appName, style: TextStyle(fontWeight: FontWeight.bold),)
       ],
     );
   }

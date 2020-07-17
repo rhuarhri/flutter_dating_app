@@ -108,6 +108,8 @@ class AccountUpdateScreen extends StatelessWidget
   of them. But I have always done what I believe is right for the people.
 
 
+  message for testers
+  Hi I am developing an app as a part of my course, but in order to prove that it works I need people to test it. All you have to do it play with the app and tell me what you think. All you need is your smartphone. Any help is appreciated.
 
 
    */

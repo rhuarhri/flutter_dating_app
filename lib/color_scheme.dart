@@ -36,3 +36,5 @@ BoxDecoration containerDecoration() {
         ),
     );
 }
+
+String appName = "Best of the bunch";
