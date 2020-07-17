@@ -217,9 +217,9 @@ class _ChatBody extends State<ChatBody> {
 
               Flexible(child:
               IconButton(icon: Icon(MdiIcons.delete, color: iconColor,), onPressed: (){
-                MatchManager matchManager = MatchManager();
-                matchManager.reject(match.accountId);
-                setup();
+                //MatchManager matchManager = MatchManager();
+                //matchManager.reject(match.accountId);
+                //setup();
               },),
                 fit: FlexFit.loose,
                 flex: 1,

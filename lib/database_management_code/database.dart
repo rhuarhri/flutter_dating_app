@@ -123,13 +123,19 @@ class DBProvider
   void updateDescriptionValue(DescriptionValue newDescriptionValue) async
   {
     final db = await database;
-    _updateToDescription.updateDescriptionValue(db, newDescriptionValue);
+    _updateToDescription.updateDescriptionValue(db, newDescriptionValue.name);
   }
 
   void updateDescriptionValueInterestScore(String name) async
   {
     final db = await database;
     _updateToDescription.updateDescriptionValueInterestScore(db, name);
+  }
+
+  void updateDescriptionValueSentiment(String name, double newSentiment) async
+  {
+    final db = await database;
+    _updateToDescription.updateDescriptionValueSentimentScore(db, name, newSentiment);
   }
 
   Future<List<DescriptionValue>> getDescriptionValues() async
@@ -250,10 +256,13 @@ class DBProvider
   DeleteFromMatched _deleteFromMatched = DeleteFromMatched();
   UpdateToMatched _updateToMatched = UpdateToMatched();
 
+
   void addMatched(String accountId, int rating, String name, String image, String description) async
   {
     final db = await database;
+
     _addToMatched.addMatched(db, accountId, rating, name, image, description);
+
   }
 
   Future<List<Matched>> getMatched() async

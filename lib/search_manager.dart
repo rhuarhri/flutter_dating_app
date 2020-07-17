@@ -27,34 +27,62 @@ class AccountInfo
 
 class Searcher
 {
-  /*TODO It may be a good idea for the user to change age range and location manually
-  however this could cause a problem as any can to the age or location may create a new query
-  with a different set of results. This is a problem as the app will need to store the last
-  location it got to in a large query which will become useless in a new query.
-   */
-  int _maxAge = 0;
-  int _minAge = 0;
 
   //This is the fresh hold that an account must score in order to match
   int _accuracy = 0;
 
-
-  List<DocumentSnapshot> _searchResult = [];
-
   //this variable contains all the ids of the accounts that liked the user
   List<String> _likedAccounts = [];
 
-  List<AccountInfo> _filteredResult = [];
-
   LocationManager locationManager = LocationManager();
 
-
-  Future<List<AccountInfo>> search() async
+  Future<List<AccountInfo>> getOnlineAccounts() async
   {
+    List<AccountInfo> foundAccounts = [];
 
-    getInitialResult();
+    String lastId = "";
+    bool isAfter = false;
 
-    //getUserLikesAndHates();
+    bool isHistoryEmpty = await DBProvider.db.isHistoryEmpty();
+    History currentHistory = await DBProvider.db.getHistory();
+
+    if (isHistoryEmpty == false)
+      {
+        lastId = currentHistory.lastID;
+      }
+    else
+      {
+        lastId = "";
+      }
+
+    while (foundAccounts.length < 3)
+      {
+        List<AccountInfo> searchResults = await _search(lastId, isAfter);
+
+        foundAccounts.addAll(searchResults);
+
+        if (searchResults.last.accountId != null)
+          {
+            lastId = searchResults.last.accountId;
+            isAfter = true;//search for everything after the last account
+          }
+        else
+          {
+            //if last element is null means the app has reached the end of what is currently available
+            break;
+          }
+
+      }
+
+      return foundAccounts;
+  }
+
+  Future<List<AccountInfo>> _search(String nextId, bool isAfter) async
+  {
+    print("on start last id is " + nextId);
+
+    List<AccountInfo> _filteredResult = [];
+
 
     UserInfo userInfo = await DBProvider.db.getUser();
     double distance = userInfo.distance;
@@ -62,8 +90,9 @@ class Searcher
 
     Position usersPosition = await locationManager.getCurrentLocation();
 
+    List<DocumentSnapshot> _searchResult = [];
     OnlineDatabaseManager onlineManager = OnlineDatabaseManager();
-    _searchResult = await onlineManager.getSearchResults();
+    _searchResult = await onlineManager.getSearchResults(nextId, isAfter);
 
 
     List<DescriptionValue> likes = await DBProvider.db.getPositiveDescriptionValue(freshHold: searchLikeFresherHold);
@@ -74,11 +103,16 @@ class Searcher
     List<String> blockedUsers = await DBProvider.db.getBlockedUser();
     //blockerUsers are the ids of the accounts the user has see or does no like
 
+    _accuracy = (await DBProvider.db.getUser()).accuracy;
+
+
     print("data from firebase is " + _searchResult.length.toString());
 
     for(int i = 0; i < _searchResult.length; i++)
       {
         DocumentSnapshot element = _searchResult[i];
+
+        print("firebase account id is " + element.documentID);
 
       double accountLat = element.data["lat"];
       double accountLong = element.data["long"];
@@ -116,13 +150,15 @@ class Searcher
                   }
               }
 
-            print("match sore is " + matchScore.toString());
+            //print("match sore is " + matchScore.toString());
+
+            print("accuracy is " + _accuracy.toString());
 
             if (matchScore >= _accuracy) {
               //accuracy is determined by the user because if it is too high then the user will get
               //little or no match
               print("it a match");
-              await _addToResult(element, usersPosition);
+              _filteredResult.add(await _addToResult(element, usersPosition));
             }
             else {
               print("not a match");
@@ -143,6 +179,8 @@ class Searcher
 
   }
 
+
+
   List<String> dynamicListToStringList(List<dynamic> input)
   {
     List<String> result = [];
@@ -155,7 +193,7 @@ class Searcher
     return result;
   }
 
-  void _addToResult(DocumentSnapshot data, Position usersPosition) async
+  Future<AccountInfo> _addToResult(DocumentSnapshot data, Position usersPosition) async
   {
     double accountLat = data.data["lat"];
     double accountLong = data.data["long"];
@@ -172,12 +210,16 @@ class Searcher
     matchedAccount.description = userBasicInfo.data["description"];
     matchedAccount.name = userBasicInfo.data["name"];
 
-    _filteredResult.add(matchedAccount);
+    return matchedAccount;
   }
 
-  void getInitialResult() async
+  bool isMatch()
   {
+    bool isMatch = false;
 
+
+
+    return isMatch;
   }
 
   double findMatches(List<String> input, List<DescriptionValue> checkAgainst, bool isLiked) {
@@ -260,27 +302,17 @@ class Searcher
 
     likeScore = 100 - (findMatches(accountLikes, userLikes, true));
 
-    //print("like score " + likeScore.toStringAsFixed(3));
-
     totalScore = totalScore - likeScore;
-
-    //print("total score plus likes " + totalScore.toStringAsFixed(3));
 
     double mustHaveScore = 0;
 
     mustHaveScore = 100 - (findMatches(accountLikes, userMustHaves, true));
 
-    //print("must have score " + mustHaveScore.toStringAsFixed(3));
-
     if (mustHaveScore != 0) {
       mustHaveScore = (mustHaveScore * 2);
-
-      //print("must have score doubled " + mustHaveScore.toStringAsFixed(3));
     }
 
     totalScore = totalScore - mustHaveScore;
-
-    //print("total score minus must have score" + totalScore.toStringAsFixed(3));
 
     double hateScore = 0;
     double mustNotHaveScore = 0;
@@ -288,17 +320,10 @@ class Searcher
     if (accountLikes.isNotEmpty) {
       hateScore = (findMatches(accountLikes, userHates, false));
 
-      //print("hate score " + hateScore.toStringAsFixed(3));
-
       mustNotHaveScore = (findMatches(accountLikes, userMustNotHaves, false));
-
-      //print("must not have score " + mustNotHaveScore.toStringAsFixed(3));
 
       if (mustNotHaveScore > 0) {
         mustNotHaveScore = mustNotHaveScore * 2;
-
-        //print("must not have score doubled " +
-            //mustNotHaveScore.toStringAsFixed(3));
       }
     } else {
       hateScore = 100;
@@ -306,14 +331,8 @@ class Searcher
     }
 
     totalScore = totalScore - hateScore;
-    //print("total score plus hate score " + totalScore.toStringAsFixed(3));
 
     totalScore = totalScore - mustNotHaveScore;
-
-    /*print("total score plus must not have score " +
-        totalScore.toStringAsFixed(3));
-
-    print("total score " + totalScore.toStringAsFixed(3));*/
 
     double finalScore = (totalScore / maxScore) * 100;
 

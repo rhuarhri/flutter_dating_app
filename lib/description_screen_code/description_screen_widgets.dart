@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
+import 'package:speech_to_text/speech_recognition_result.dart';
+import 'package:speech_to_text/speech_to_text.dart';
+import 'package:permission_handler/permission_handler.dart';
 import '../color_scheme.dart';
 import '../common_widgets.dart';
 
@@ -14,11 +17,12 @@ class DescriptionScreenWidgets
 class DescriptionBody extends StatefulWidget {
 
   Function onCompleteAction;
-  DescriptionBody(this.onCompleteAction);
+  BuildContext screenContext;
+  DescriptionBody(this.onCompleteAction, this.screenContext);
 
   @override
   State<StatefulWidget> createState() {
-    return _DescriptionBody(onCompleteAction);
+    return _DescriptionBody(onCompleteAction, screenContext);
   }
 }
 
@@ -34,12 +38,17 @@ int characterAmount = 0;
 class _DescriptionBody extends State<DescriptionBody>
 {
   Function onCompleteAction;
-  _DescriptionBody(this.onCompleteAction);
+  BuildContext screenContext;
+  _DescriptionBody(this.onCompleteAction, this.screenContext);
 
 
   @override
   Widget build(BuildContext context) {
-    return Column(
+    return Scaffold(
+      appBar: DescriptionScreenWidgets().descriptionAppBar(context),
+      floatingActionButton: _actionBTN(),
+
+      body:Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
 
       children: <Widget>  [
@@ -84,7 +93,8 @@ class _DescriptionBody extends State<DescriptionBody>
 
         //progressBar(),
         //CircularProgressIndicator(),
-      ],);
+      ],)
+      ,);
   }
 
   bool isLoading = false;
@@ -94,7 +104,6 @@ class _DescriptionBody extends State<DescriptionBody>
     {
       return
         Flexible(child: LinearProgressIndicator(), fit: FlexFit.loose, flex: 2,);
-      //progressBar();
 
     }
     else
@@ -118,10 +127,12 @@ class _DescriptionBody extends State<DescriptionBody>
 
             setState(() {
               isLoading = true;
+              _isRecording = false;
             });
 
-          onCompleteAction.call();
+            _speechToText.stop();
 
+          onCompleteAction.call();
 
           },)
       ],
@@ -133,6 +144,95 @@ class _DescriptionBody extends State<DescriptionBody>
         fit: FlexFit.tight,
         flex: 2,
       );
+  }
+
+  bool _isRecording = false;
+
+  Widget _actionBTN()
+  {
+    Widget icon;
+
+    if (_isRecording == true)
+      {
+        icon = Icon(MdiIcons.microphoneOff);
+      }
+    else
+      {
+        icon = Icon(MdiIcons.microphone);
+      }
+
+    return FloatingActionButton(backgroundColor: secondary, child: icon, onPressed: (){
+      if(_isRecording == true)
+        {
+          _speechToText.stop();
+          print("recording stopped");
+          setState(() {
+            _isRecording = false;
+          });
+          recordingPopup(context);
+        }
+      else
+        {
+          _startSpeechRecognition();
+        }
+    },);
+  }
+
+  SpeechToText _speechToText = SpeechToText();
+  void _startSpeechRecognition() async
+  {
+    var status = await Permission.microphone.status;
+
+    if (status.isUndetermined)
+    {
+      Permission.microphone.request();
+      print("requested permission");
+    }
+    else{
+      await _speechToText.initialize();
+
+      if (_speechToText.isAvailable == true)
+      {
+        print("recording");
+        _speechToText.listen(onResult: _resultListener);
+        setState(() {
+          _isRecording = true;
+        });
+        recordingPopup(context);
+      }
+      else{
+        print("speech to text is not available");
+      }
+
+    }
+  }
+
+
+  void _resultListener(SpeechRecognitionResult result) {
+
+    setState(() {
+      descriptionController.text = "${result.recognizedWords}";
+      characterAmount = descriptionController.text.length;
+    });
+
+    print("result is " + descriptionController.text);
+  }
+
+  void recordingPopup(BuildContext context)
+  {
+    String message = "";
+
+    if (_isRecording == true)
+      {
+        message = "Voice recording started. Press the microphone button to stop.";
+      }
+    else
+      {
+        message = "Voice recording stopped";
+      }
+
+    popup("Voice recording", message, context, null);
+
   }
 
 }

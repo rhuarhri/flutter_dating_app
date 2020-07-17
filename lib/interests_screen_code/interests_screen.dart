@@ -321,13 +321,14 @@ class _InterestScreen extends State<InterestScreen>
                   {
                     liked[itemIndex].sentiment = (newSentimentValue);
                     print("like sentiment value is " + newSentimentValue.toString() + " for item names " + liked[itemIndex].name);
-                    updateItem(liked[itemIndex]);
+                    DBProvider.db.updateDescriptionValueSentiment(liked[itemIndex].name, (newSentimentValue));
                   }
                   else
                   {
                     hated[itemIndex].sentiment = (newSentimentValue - (newSentimentValue * 2));
                     print("hated sentiment value is " + (newSentimentValue - (newSentimentValue * 2)).toString() + " for item names " + hated[itemIndex].name);
-                    updateItem(hated[itemIndex]);
+                    DBProvider.db.updateDescriptionValueSentiment(hated[itemIndex].name,
+                        (newSentimentValue - (newSentimentValue * 2)));
                   }
                 });
 
@@ -406,23 +407,23 @@ class _InterestScreen extends State<InterestScreen>
             })));
   }
 
-  void addItem(DescriptionValue newItem)
+  void addItem(DescriptionValue newItem) async
   {
     newItem.name = newItem.name.toLowerCase();
-    DBProvider.db.userAddDescriptionValue(newItem);
+    await DBProvider.db.userAddDescriptionValue(newItem);
     //refreshLists();
   }
 
-  void updateItem(DescriptionValue newItem)
+  void updateItem(DescriptionValue newItem) async
   {
     newItem.name = newItem.name.toLowerCase();
-    DBProvider.db.updateDescriptionValue(newItem);
+    await DBProvider.db.updateDescriptionValue(newItem);
   }
 
-  void deleteItem(String name)
+  void deleteItem(String name) async
   {
     String findName = name.toLowerCase();
-    DBProvider.db.deleteDescriptionValue(findName);
+    await DBProvider.db.deleteDescriptionValue(findName);
     //refreshLists();
   }
 

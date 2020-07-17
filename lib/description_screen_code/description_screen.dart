@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutterdatingapp/database_management_code/online_database.dart';
+import '../description_analyzer.dart';
 import '../interests_screen_code/interests_screen.dart';
 import '../common_widgets.dart';
 import './description_screen_widgets.dart';
@@ -29,6 +30,7 @@ class DescriptionScreen extends StatelessWidget {
               {
 
                 String description = descriptionController.text;
+                DescriptionAnalyzer().analyze(description, context);
                 toNextScreen(context, description);
 
               }
@@ -36,10 +38,13 @@ class DescriptionScreen extends StatelessWidget {
 
     };
 
+    /*
     return Scaffold(
       appBar: DescriptionScreenWidgets().descriptionAppBar(context),
       body: DescriptionBody(onCompleteAction),
-    );
+      floatingActionButton: actioBTN(),
+    );*/
+    return DescriptionBody(onCompleteAction, context);
   }
 
   void toNextScreen(BuildContext context, String description) async
@@ -50,6 +55,7 @@ class DescriptionScreen extends StatelessWidget {
     //isDone makes the app await
 
     Navigator.push(context, MaterialPageRoute(builder: (context) => InterestsScreen()));
+
   }
 
 }

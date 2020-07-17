@@ -133,11 +133,11 @@ class OnlineDatabaseManager
   }
 
   //Getting from online database section
-  Future<List<DocumentSnapshot>> getSearchResults() async
+  Future<List<DocumentSnapshot>> getSearchResults(String documentId, bool startAfter) async
   {
 
     GetOnlineManager getOnlineManager = GetOnlineManager();
-    return getOnlineManager.getSearchResults();
+    return getOnlineManager.getSearchResults(documentId, startAfter);
 
   }
 

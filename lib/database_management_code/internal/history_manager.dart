@@ -18,6 +18,8 @@ class AddToHistory
     }
     else
     {
+      newHistory = foundHistory[0];
+      newHistory.lastID = lastId;
       await db.update("History", newHistory.toMap());
     }
 
@@ -31,11 +33,15 @@ class GetFromHistory
 
   Future<History> getHistory(Database db) async
   {
-    var res = await db.query("History");
-    List<History> foundHistory =
-    res.isNotEmpty ? res.map((h) => History.fromMap(h)).toList() : [];
+    History emptyHistory = History();
+    emptyHistory.lastID = "";
+    emptyHistory.id = 0;
 
-    return foundHistory[0];
+    var res = await db.query("History");
+    History foundHistory =
+    res.isNotEmpty ? res.map((h) => History.fromMap(h)).toList()[0] : emptyHistory;
+
+    return foundHistory;
   }
 
 }

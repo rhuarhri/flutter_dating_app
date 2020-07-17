@@ -21,8 +21,6 @@ class AppAds {
 
   static void init() => _ads ??= Ads(
     AdInfo.appId,
-    //bannerUnitId: bannerUnitId,
-    //screenUnitId: screenUnitId,
     keywords: <String>['ibm', 'computers'],
     //contentUrl: 'http://www.ibm.com',
     childDirected: false,

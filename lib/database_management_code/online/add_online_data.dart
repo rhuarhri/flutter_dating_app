@@ -53,7 +53,7 @@ class AddOnlineManager
     userInfo.lookingFor = lookingFor.toLowerCase();
     userInfo.descriptionStyle = "";
     userInfo.distance = 100;
-    userInfo.accuracy = 50;
+    userInfo.accuracy = 20;
     DBProvider.db.addUser(userInfo);
   }
 

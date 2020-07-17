@@ -153,7 +153,14 @@ class GetFromDescription
 class UpdateToDescription
 {
 
-  updateDescriptionValue(Database db, DescriptionValue updatedValue)
+  updateDescriptionValue(Database db, String name) async
+  {
+    DescriptionValue updatedValue = await GetFromDescription().getDescriptionValue(db, name);
+
+    update(db, updatedValue);
+  }
+
+  void update(Database db, DescriptionValue updatedValue)
   {
     db.update("DescriptionValue", updatedValue.toMap(), where: "id = ?", whereArgs: [updatedValue.id]);
   }
@@ -162,7 +169,14 @@ class UpdateToDescription
   {
     DescriptionValue currentValue = await GetFromDescription().getDescriptionValue(db, name);
     currentValue.interestScore++;
-    updateDescriptionValue(db, currentValue);
+    update(db, currentValue);
+  }
+
+  updateDescriptionValueSentimentScore(Database db, String name, double sentiment) async
+  {
+    DescriptionValue currentValue = await GetFromDescription().getDescriptionValue(db, name);
+    currentValue.sentiment = sentiment;
+    update(db, currentValue);
   }
 }
 
@@ -184,7 +198,7 @@ class _MatchHandler
 
   void checkForMatches(Database db, DescriptionValue currentDescriptionValue, isLiked)
   {
-    _matchFound(db, currentDescriptionValue, isLiked);
+    _matchFound(db, currentDescriptionValue.name, isLiked);
   }
 
   final _databaseReference = Firestore.instance;
@@ -196,8 +210,14 @@ class _MatchHandler
   is not enough people then it would be unlikely that a match will be found in a given amount of time.
    */
 
-  void _matchFound(Database db, DescriptionValue currentDescriptionValue, isLiked) async
+  void _matchFound(Database db, String name, isLiked) async
   {
+    DescriptionValue currentDescriptionValue = await GetFromDescription().getDescriptionValue(db, name);
+
+    print("testing matchable");
+
+    print("item name is " + currentDescriptionValue.name);
+
     Query query = _databaseReference.collection("interests").where(
         "name", isEqualTo: currentDescriptionValue.name);
 
@@ -240,15 +260,18 @@ class _MatchHandler
       DescriptionValue newDescriptionValue = currentValue;
       if (isMatchable == true)
       {
-        currentValue.matchable = 1;
+        newDescriptionValue.matchable = 1;
         print("matchable is true");
         //OnlineDatabaseManager().addDescriptionValue(currentValue.name);
       }
       else{
-        currentValue.matchable = 0;
+        newDescriptionValue.matchable = 0;
         print("matchable is false");
       }
 
-      UpdateToDescription().updateDescriptionValue(db, newDescriptionValue);
+      print("id is " + newDescriptionValue.id.toString());
+
+      print("new matchable value is " + newDescriptionValue.matchable.toString());
+      UpdateToDescription().update(db, newDescriptionValue);
     }
 }

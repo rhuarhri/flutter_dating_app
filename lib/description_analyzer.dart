@@ -133,7 +133,7 @@ class DescriptionAnalyzer
             DescriptionValue value = DescriptionValue();
             value.name = element.name.toLowerCase();
             value.sentiment = element.sentiment.score;
-            value.matchable = 1;
+            //value.matchable = 1;
 
             DBProvider.db.userAddDescriptionValue(value);
 

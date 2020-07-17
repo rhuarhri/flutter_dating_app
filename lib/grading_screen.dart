@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutterdatingapp/account_screen_code/account_update_screen.dart';
+import 'package:flutterdatingapp/database_management_code/database.dart';
 import 'package:flutterdatingapp/description_screen_code/description_update_screen.dart';
 import 'package:flutterdatingapp/picture_screen_code/picture_update_screen.dart';
 import 'package:flutterdatingapp/search_manager.dart';
@@ -253,13 +254,23 @@ class _GradingPage extends State<GradingPage>
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Icon(MdiIcons.starOutline, size: 80,),
-            Icon(MdiIcons.star, size: 80,)
+            Icon(MdiIcons.thumbDown, size: 80,),
+            Icon(MdiIcons.thumbUp, size: 80,)
 
           ],),
           color: primary,),
         onDismissed: (direction) {
           if (getAccount(displayedOption).accountId != "") {
+
+            if (direction == DismissDirection.startToEnd)
+              {
+                _currentGrade = 0;
+              }
+            else
+              {
+                _currentGrade = 5;
+              }
+
             gradingPopup(context);
           }
         },
@@ -373,14 +384,21 @@ class _GradingPage extends State<GradingPage>
             MatchManager().addMatch(getAccount(displayedOption).name, getAccount(displayedOption).imageLocation,
                 getAccount(displayedOption).description, getAccount(displayedOption).accountId, _currentGrade);
 
-            if(accounts.length < 3)
-              {
-                //TODO get more accounts
-              }
+            String lastId = getAccount(optionOneLoc).accountId;
 
             setState(() {
               accounts.removeAt(displayedOption);
             });
+
+            if(accounts.length < 3)
+            {
+              //TODO get more accounts
+              print("get more accounts");
+
+              DBProvider.db.addHistory(lastId);
+              setup();
+            }
+
             Navigator.pop(context);
           },)
         ],
@@ -431,16 +449,21 @@ class _GradingPage extends State<GradingPage>
   {
     Searcher searchManager = Searcher();
 
-    List<AccountInfo> foundAccounts = await searchManager.search();
+    List<AccountInfo> foundAccounts = await searchManager.getOnlineAccounts();
     print("search result length is " + foundAccounts.length.toString());
 
+    print("displayed accounts length is " + accounts.length.toString());
+    accounts.clear();
+    print("displayed accounts length is " + accounts.length.toString());
     accounts.addAll(foundAccounts);
+    print("displayed accounts length is " + accounts.length.toString());
 
     setState(() {
 
     });
   }
 
+  /*
   void databaseTest() async
   {
 
@@ -458,6 +481,6 @@ class _GradingPage extends State<GradingPage>
     });
 
 
-  }
+  }*/
 
 }

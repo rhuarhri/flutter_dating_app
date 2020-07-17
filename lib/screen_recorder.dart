@@ -24,7 +24,7 @@ class Recorder
         shape: buttonBorderStyle,
         actions: [
           FlatButton(child: Text("Start Recording"), onPressed: () {
-            requestPermissionsForRecording();
+            _requestPermissionsForRecording();
             Navigator.pop(context);
             //start();
           },)
@@ -35,18 +35,33 @@ class Recorder
 
   void start() async
   {
-    print("set up screen recording");
-    bool started = await FlutterScreenRecording.startRecordScreen(_fileName);
-    if (started == true)
-    {
-      print("recording started");
+    var status = await Permission.storage.status;
+
+    if (status.isUndetermined) {
+      Permission.storage.request();
+
     }
-    else{
-      print("recording failed to start");
-    }
+
+    if (status.isGranted)
+      {
+        print("set up screen recording");
+        bool started = await FlutterScreenRecording.startRecordScreen(_fileName);
+        if (started == true) {
+          print("recording started");
+        }
+        else {
+          print("recording failed to start");
+        }
+      }
+    else
+      {
+        print("permission denied");
+      }
+
+
   }
 
-  void requestPermissionsForRecording() async
+  void _requestPermissionsForRecording() async
   {
     var status = await Permission.storage.status;
 

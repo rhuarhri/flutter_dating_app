@@ -51,6 +51,7 @@ dependencies:
   firebase_ml_vision: ^0.9.4
 
   flutter_tts: 1.2.3
+  speech_to_text:
 
   ads:
 

@@ -74,6 +74,41 @@ class AccountUpdateScreen extends StatelessWidget
   later made me a professional comedian.
 
 
+  amber heard
+  acting
+  films
+
+  I come from Austin Texas and I grew up riding horses, hunting and fishing and was a devout catholic, so
+  I was in a way a stereotypical Texan. I also participated in a number of beauty competitions, yet another
+  texan tradition. This lead on to a modeling career and then to acting. I played roles in a verity of movies
+  some of which were not critically nor commercially successful, and some roles in the DC extended universe.
+  As well as being an actor, I am also a keen activist supporting groups like LGBTQ.
+
+  Joseph Stalin
+  politics
+  painting
+  drama
+  poetry
+
+  I came from humble beginnings as the son of a shoe maker. I am fairly smart with a particular skill in
+  poetry and painting. But my story real began in my training as a priest. I was one of 600 trainee priest
+  I got a reputation as a trouble maker and the fact that I declared myself atheist didn't help. I
+  also joined forbidden book clubs preaching pro revolutionary and marxist ideals. For there I continued
+  to help activist groups with their protests never though it put me in danger of arrest. After the death
+  of my good friend Vladimir Lenin I worked by way up the ranks of the soviet union until I eventually
+  was the leader.
+
+  Carrie lam
+  politics
+
+  I come from a working class family in Hong Kong. I always aim to help Hong Kong and improve the lives of it's
+  citizens. So when I left university I started a career as a civil servant. I have seen Hong Kong change
+  over the years, resulting it's reintegration with china. I am no stranger to controversy as I have
+  been a driving force behind many unpopular decisions. Some people have called by a Beijing puppet, because
+  of them. But I have always done what I believe is right for the people.
+
+
+
 
    */
 

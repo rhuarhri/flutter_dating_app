@@ -33,10 +33,11 @@ class DescriptionUpdateScreen extends StatelessWidget {
       Navigator.pop(context);
     };
 
-    return Scaffold(
+    return DescriptionBody(onCompleteAction, context);
+    /*return Scaffold(
       appBar: DescriptionScreenWidgets().descriptionAppBar(context),
       body: DescriptionBody(onCompleteAction),
-    );
+    );*/
   }
 
   void toNextScreen(BuildContext context, String description) async
