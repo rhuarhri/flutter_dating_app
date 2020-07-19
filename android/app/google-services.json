@@ -10,7 +10,7 @@
       "client_info": {
         "mobilesdk_app_id": "1:464210738061:android:bc3bd8769dfb5872cb1bc4",
         "android_client_info": {
-          "package_name": "com.example.flutterdatingapp"
+          "package_name": "com.datingapp.flutterdatingapp"
         }
       },
       "oauth_client": [

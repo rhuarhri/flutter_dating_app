@@ -58,7 +58,10 @@ class SignInScreen extends StatelessWidget{
           Container(
             //color: Colors.green,
             child: Column(children: <Widget>[
-              Icon(MdiIcons.android, size: 200),
+              Padding(child: Image.asset("assets/dating_app_icon.png", height: 200, width: 200,),
+              padding: EdgeInsets.all(16.0),
+              ),
+              //Icon(MdiIcons.android, size: 200),
               Text(appName, textScaleFactor: 2.0,),
             ],
             ),

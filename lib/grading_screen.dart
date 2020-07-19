@@ -43,8 +43,9 @@ class _StartGrading extends State<StarGrading>
     return
       Container(child:
       Row(
+        mainAxisAlignment: MainAxisAlignment.center,
       mainAxisSize: MainAxisSize.min,
-      children: List.generate(5, (index) {
+      children: List.generate(3, (index) {
         return
             IconButton(icon: Icon(
               index < _currentGrade ? MdiIcons.star : MdiIcons.starOutline,
@@ -462,25 +463,5 @@ class _GradingPage extends State<GradingPage>
 
     });
   }
-
-  /*
-  void databaseTest() async
-  {
-
-    MatchManager matchManager = MatchManager();
-
-    List<MatchInfo> result = await matchManager.getMatches();
-
-    if (result.isEmpty)
-      {
-        print("no matches found");
-      }
-
-    result.forEach((element) {
-      print("name is " + element.name);
-    });
-
-
-  }*/
 
 }

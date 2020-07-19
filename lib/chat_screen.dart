@@ -259,7 +259,11 @@ class _ChatBody extends State<ChatBody> {
 
     await DBProvider.db.setupMessages();
 
-    messageAmount = await DBProvider.db.getMessageAmount();
+    int foundMessageAmount = await DBProvider.db.getMessageAmount();
+    if (foundMessageAmount != null)
+      {
+        messageAmount = foundMessageAmount;
+      }
 
     setState(() {
 

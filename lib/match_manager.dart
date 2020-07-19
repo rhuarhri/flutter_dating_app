@@ -59,7 +59,7 @@ class MatchManager
         }
 
       DBProvider.db.deleteMatched(deleteAccount);
-      _deleteMatchOnline(accountId);
+      _deleteMatchOnline(deleteAccount);
     }
 
     if (grade > 4)//i.e. only the highest scores
@@ -97,6 +97,7 @@ class MatchManager
 
   void reject(String accountId)
   {
+    DBProvider.db.deleteMatched(accountId);
     _deleteMatchOnline(accountId);
   }
 
@@ -114,7 +115,6 @@ class MatchManager
 
 
       DBProvider.db.deleteBlocked(accountId);
-      DBProvider.db.deleteMatched(accountId);
 
   }
 
