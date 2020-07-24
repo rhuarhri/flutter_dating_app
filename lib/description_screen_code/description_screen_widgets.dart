@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutterdatingapp/speech_to_text.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
-import 'package:speech_to_text/speech_recognition_result.dart';
-import 'package:speech_to_text/speech_to_text.dart';
+//import 'package:speech_to_text/speech_recognition_result.dart';
+//import 'package:speech_to_text/speech_to_text.dart';
 import 'package:permission_handler/permission_handler.dart';
 import '../color_scheme.dart';
 import '../common_widgets.dart';
@@ -130,7 +131,7 @@ class _DescriptionBody extends State<DescriptionBody>
               _isRecording = false;
             });
 
-            _speechToText.stop();
+            _speechRecognizer.stop();
 
           onCompleteAction.call();
 
@@ -164,7 +165,7 @@ class _DescriptionBody extends State<DescriptionBody>
     return FloatingActionButton(backgroundColor: secondary, child: icon, onPressed: (){
       if(_isRecording == true)
         {
-          _speechToText.stop();
+          _speechRecognizer.stop();
           print("recording stopped");
           setState(() {
             _isRecording = false;
@@ -178,7 +179,7 @@ class _DescriptionBody extends State<DescriptionBody>
     },);
   }
 
-  SpeechToText _speechToText = SpeechToText();
+  SpeechRecognizer _speechRecognizer = SpeechRecognizer();
   void _startSpeechRecognition() async
   {
     var status = await Permission.microphone.status;
@@ -189,25 +190,25 @@ class _DescriptionBody extends State<DescriptionBody>
       print("requested permission");
     }
     else{
-      await _speechToText.initialize();
+      await _speechRecognizer.setup();
 
-      if (_speechToText.isAvailable == true)
-      {
+      //if (_speechToText.isAvailable == true)
+      //{
         print("recording");
-        _speechToText.listen(onResult: _resultListener);
+        _speechRecognizer.start();
         setState(() {
           _isRecording = true;
         });
-        recordingPopup(context);
-      }
-      else{
-        print("speech to text is not available");
-      }
+        //recordingPopup(context);
+      //}
+      //else{
+        //print("speech to text is not available");
+      //}
 
     }
   }
 
-
+/*
   void _resultListener(SpeechRecognitionResult result) {
 
     setState(() {
@@ -216,7 +217,7 @@ class _DescriptionBody extends State<DescriptionBody>
     });
 
     print("result is " + descriptionController.text);
-  }
+  }*/
 
   void recordingPopup(BuildContext context)
   {

@@ -51,9 +51,12 @@ dependencies:
   firebase_ml_vision: ^0.9.4
 
   flutter_tts: 1.2.3
-  speech_to_text:
+  speech_to_text: 2.3.0
 
   ads:
+
+  camera:
+  video_thumbnail:
 
   # for testing
   flutter_screen_recording:
