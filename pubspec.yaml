@@ -47,6 +47,7 @@ dependencies:
 
   network_to_file_image:
   cached_network_image:
+  cached_video_player:
 
   firebase_ml_vision: ^0.9.4
 

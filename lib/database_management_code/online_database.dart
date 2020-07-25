@@ -87,9 +87,19 @@ class OnlineDatabaseManager
       addOnlineManager.addUserImage(image);
   }
 
+  void addVideo(File video) async
+  {
+    addOnlineManager.addUserVideo(video);
+  }
+
   void updateImage(File image) async
   {
     updateManager.updateImage(image);
+  }
+
+  void updateVideo(File video) async
+  {
+    updateManager.updateVideo(video);
   }
 
   void addFaceShape(String faceShape) async

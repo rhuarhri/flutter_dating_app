@@ -15,10 +15,11 @@ class AccountInfo
   String name;
   String description;
   String imageLocation;
+  String videoLocation;
   int age;
   int distance;
 
-  AccountInfo.createAccountInfo(this.accountId, this.name, this.description, this.imageLocation, this.age, this.distance);
+  AccountInfo.createAccountInfo(this.accountId, this.name, this.description, this.imageLocation, this.videoLocation, this.age, this.distance);
 
   AccountInfo();
 
@@ -207,6 +208,7 @@ class Searcher
     DocumentSnapshot userBasicInfo = await OnlineDatabaseManager().getDescription(data.documentID);
 
     matchedAccount.imageLocation = userBasicInfo.data["image"];
+    matchedAccount.videoLocation = userBasicInfo.data["video"];
     matchedAccount.description = userBasicInfo.data["description"];
     matchedAccount.name = userBasicInfo.data["name"];
 

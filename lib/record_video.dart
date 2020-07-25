@@ -8,29 +8,41 @@ import 'package:material_design_icons_flutter/material_design_icons_flutter.dart
 import 'package:flutterdatingapp/common_widgets.dart';
 
 import './color_scheme.dart';
+import 'database_management_code/online_database.dart';
+import 'face_detection.dart';
+import 'interests_screen_code/interests_screen.dart';
 
 
 class VideoRecorderScreen extends StatelessWidget
 {
+  String description = "";
+
+  VideoRecorderScreen({Key key, @required this.description}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
-    return VideoRecorderBody();
+    return VideoRecorderBody(description);
   }
 
 }
 
 class VideoRecorderBody extends StatefulWidget
 {
+  String description = "";
+  VideoRecorderBody(this.description);
 
   @override
   State<StatefulWidget> createState() {
-    return _VideoRecorderBody();
+    return _VideoRecorderBody(description);
   }
 
 }
 
 class _VideoRecorderBody extends State<VideoRecorderBody>
 {
+  String description = "";
+
+  _VideoRecorderBody(this.description);
 
   CameraHandler camera = CameraHandler();
 
@@ -66,11 +78,8 @@ class _VideoRecorderBody extends State<VideoRecorderBody>
     autoStopVideo();
 
     return Scaffold(
-      //appBar: appBar("video recorder", Icon(MdiIcons.camera), context),
       body: screenBody(context),
-      //floatingActionButton: actionBTN(),
       bottomNavigationBar: footer(context),
-      //persistentFooterButtons: [],
     );
   }
 
@@ -106,8 +115,8 @@ class _VideoRecorderBody extends State<VideoRecorderBody>
             [
               Container(
                   child: Column(children: <Widget>[
-                    Text("Transcript"),//Name
-                    Text("description should go here"),
+                    Text("Transcript"),
+                    Text(description),
                   ],),
                   color: Colors.white
               ),
@@ -118,7 +127,6 @@ class _VideoRecorderBody extends State<VideoRecorderBody>
       shrinkWrap: true,
     );
 
-    //return camera.cameraPreview(isSetup);
 
   }
 
@@ -135,16 +143,14 @@ class _VideoRecorderBody extends State<VideoRecorderBody>
 
       recordButton(context),
 
-      helpButtons("help info", "tip info", context),
-      /*
-      IconButton(icon: Icon(MdiIcons.check, color: Colors.black, size: 36), onPressed: (){
+      helpButtons("If you don't know what to say your description is displayed at the bottom of the screen. Swipe up to see it.",
+          "Keep yourself in the center of the screen.", context),
 
-      },),*/
     ],
       mainAxisAlignment: MainAxisAlignment.spaceAround,
     ),
 
-      cameraTimer.display(),//LinearProgressIndicator()
+      cameraTimer.display(),
     ],),
       color: primaryLight,
       height: 60,
@@ -206,6 +212,10 @@ class _VideoRecorderBody extends State<VideoRecorderBody>
       imageFile = await ImagePicker.pickImage(source: ImageSource.gallery);
 
       imagePath = imageFile.path;
+
+      saveImage(imagePath);
+
+      toNextScreen();
     };
 
     Function recordVideo = (){
@@ -233,9 +243,13 @@ class _VideoRecorderBody extends State<VideoRecorderBody>
 
     File imageFile = File(imagePath);
 
-    Widget content = Image.file(imageFile, height: 100, width: 100,);
+    Widget content = Image.file(imageFile, height: 200, width: 200,);
 
-    Function acceptImage = (){};
+    Function acceptImage = (){
+      saveImage(imagePath);
+      saveVideo(camera.videoPath);
+      toNextScreen();
+    };
 
     Function getImage = () async {
       File imageFile;
@@ -244,9 +258,9 @@ class _VideoRecorderBody extends State<VideoRecorderBody>
 
       imagePath = imageFile.path;
 
-      setState(() {
-
-      });
+      saveImage(imagePath);
+      saveVideo(camera.videoPath);
+      toNextScreen();
     };
 
     return showDialog(context: context, barrierDismissible: false,
@@ -279,7 +293,30 @@ class _VideoRecorderBody extends State<VideoRecorderBody>
       }
   }
 
+  void saveVideo(String videoPath)
+  {
+    File videoFile = File(videoPath);
 
+    OnlineDatabaseManager uploadVideo = OnlineDatabaseManager();
+    uploadVideo.addVideo(videoFile);
+  }
+
+  void saveImage(String imagePath) async
+  {
+    File imageFile = File(imagePath);
+
+    FaceDetection detector = FaceDetection();
+    detector.search(imageFile);
+
+    OnlineDatabaseManager uploadImage = OnlineDatabaseManager();
+    uploadImage.addImage(imageFile);
+  }
+
+  void toNextScreen()
+  {
+    Navigator.push(context, MaterialPageRoute(builder: (context) =>
+        InterestScreen()));
+  }
 
 
 }

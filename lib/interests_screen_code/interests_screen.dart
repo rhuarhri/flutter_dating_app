@@ -1,5 +1,4 @@
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutterdatingapp/database_management_code/internal/DataModels.dart';
 import 'package:flutterdatingapp/database_management_code/database.dart';
@@ -9,16 +8,14 @@ import 'package:material_design_icons_flutter/material_design_icons_flutter.dart
 import '../color_scheme.dart';
 import '../common_widgets.dart';
 import '../grading_screen.dart';
+import '../screen_recorder.dart';
 
 class InterestsScreen extends StatelessWidget
 {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: appBar("interests", Icon(MdiIcons.heart), context),
-      body: InterestScreen(),
-    );
+    return InterestScreen();
   }
 
 }
@@ -101,12 +98,16 @@ class _InterestScreen extends State<InterestScreen>
       }
 
     return
+    Scaffold(
+      appBar: appBar("Interest", Icon(MdiIcons.heart), context),
+      body:
     Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
 
         Container(child:
         listHeader(Icon(MdiIcons.thumbUp), "like", (){
+
           DescriptionValue newValue = DescriptionValue();
           newValue.name = likedController.text;
           newValue.sentiment = 0.4; //positive sentiment value means it is liked
@@ -121,7 +122,6 @@ class _InterestScreen extends State<InterestScreen>
         color: primary,
 
         ),
-
 
         Flexible(child:
         ListView.builder(
@@ -186,7 +186,8 @@ class _InterestScreen extends State<InterestScreen>
 
         loadingDisplay(),
 
-      ],);
+      ],),
+    );
 
   }
 
@@ -217,6 +218,7 @@ class _InterestScreen extends State<InterestScreen>
 
   void toNewScreen(BuildContext context) async
   {
+    Recorder().start();
     await OnlineDatabaseManager().addLikesAndHates();
     Navigator.push(context, MaterialPageRoute(builder: (context) => GradingScreen()));
   }
@@ -411,7 +413,7 @@ class _InterestScreen extends State<InterestScreen>
   {
     newItem.name = newItem.name.toLowerCase();
     await DBProvider.db.userAddDescriptionValue(newItem);
-    //refreshLists();
+    refreshLists();
   }
 
   void updateItem(DescriptionValue newItem) async
@@ -424,7 +426,7 @@ class _InterestScreen extends State<InterestScreen>
   {
     String findName = name.toLowerCase();
     await DBProvider.db.deleteDescriptionValue(findName);
-    //refreshLists();
+    refreshLists();
   }
 
 }

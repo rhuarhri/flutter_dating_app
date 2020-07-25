@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutterdatingapp/authentication_manager.dart';
 import 'package:flutterdatingapp/common_widgets.dart';
-import 'package:flutterdatingapp/record_video.dart';
 import 'package:flutterdatingapp/screen_recorder.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -77,14 +76,13 @@ class SignInScreen extends StatelessWidget{
 
   void toAccountScreen(BuildContext context)
   {
-    //Recorder().start();
 
     Navigator.push(context, MaterialPageRoute(builder: (context) => AccountAddScreen()));
   }
 
   void toGradingScreen(BuildContext context)
   {
-    //Recorder().start();
+    Recorder().start();
 
     Navigator.push(
         context,
@@ -121,7 +119,6 @@ class SignInScreen extends StatelessWidget{
       child:
     Icon(icon, color: Colors.white, size: 36,), onPressed: () async
       {
-
 
         var status = await Permission.camera.status;
 

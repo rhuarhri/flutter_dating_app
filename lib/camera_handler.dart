@@ -41,13 +41,7 @@ class CameraHandler
       }
     else {
       return
-        //Flexible(child: CameraPreview(_controller), fit: FlexFit.tight, flex: 1,);
         Container(child: CameraPreview(_controller),);
-
-        /*AspectRatio(
-          aspectRatio:
-          _controller.value.aspectRatio,
-          child: CameraPreview(_controller));*/
     }
   }
 
@@ -81,7 +75,6 @@ class CameraHandler
     _controller.addListener(() {
       if (_controller.value.hasError) {
         print(_controller.value.errorDescription);
-        //showInSnackBar('Camera error ${controller.value.errorDescription}');
       }
     });
 

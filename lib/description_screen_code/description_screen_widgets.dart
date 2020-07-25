@@ -4,6 +4,7 @@ import 'package:material_design_icons_flutter/material_design_icons_flutter.dart
 //import 'package:speech_to_text/speech_recognition_result.dart';
 //import 'package:speech_to_text/speech_to_text.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:speech_to_text/speech_recognition_result.dart';
 import '../color_scheme.dart';
 import '../common_widgets.dart';
 
@@ -170,7 +171,7 @@ class _DescriptionBody extends State<DescriptionBody>
           setState(() {
             _isRecording = false;
           });
-          recordingPopup(context);
+          //recordingPopup(context);
         }
       else
         {
@@ -195,7 +196,7 @@ class _DescriptionBody extends State<DescriptionBody>
       //if (_speechToText.isAvailable == true)
       //{
         print("recording");
-        _speechRecognizer.start();
+        _speechRecognizer.start(_resultListener);
         setState(() {
           _isRecording = true;
         });
@@ -208,7 +209,7 @@ class _DescriptionBody extends State<DescriptionBody>
     }
   }
 
-/*
+
   void _resultListener(SpeechRecognitionResult result) {
 
     setState(() {
@@ -217,8 +218,9 @@ class _DescriptionBody extends State<DescriptionBody>
     });
 
     print("result is " + descriptionController.text);
-  }*/
+  }
 
+  /*
   void recordingPopup(BuildContext context)
   {
     String message = "";
@@ -232,8 +234,8 @@ class _DescriptionBody extends State<DescriptionBody>
         message = "Voice recording stopped";
       }
 
-    popup("Voice recording", message, context, null);
+    //popup("Voice recording", message, context, null);
 
-  }
+  }*/
 
 }

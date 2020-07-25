@@ -48,10 +48,10 @@ class SpeechRecognizer
     print("result is " + recognizedWords);
   }
 
-  void start()
+  void start(Function resultListener)
   {
     _speech.listen(
-        onResult: _resultListener,
+        onResult: resultListener,
         listenFor: Duration(seconds: 60),
         localeId: _currentLocaleId,
         onSoundLevelChange: soundLevelListener,

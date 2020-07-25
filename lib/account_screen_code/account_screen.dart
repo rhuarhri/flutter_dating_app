@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutterdatingapp/database_management_code/online_database.dart';
-import '../picture_screen_code/picture_screen.dart';
+import 'package:flutterdatingapp/description_screen_code/description_screen.dart';
 import 'account_screen_widgets.dart';
 import '../common_widgets.dart';
 
@@ -27,7 +27,7 @@ class AccountAddScreen extends StatelessWidget
       {
         //success
         Navigator.push(
-            context, MaterialPageRoute(builder: (context) => PictureScreen()));
+            context, MaterialPageRoute(builder: (context) => DescriptionScreen()));
       }
       else
       {

@@ -7,6 +7,7 @@ import 'package:flutterdatingapp/picture_screen_code/picture_update_screen.dart'
 import 'package:flutterdatingapp/search_manager.dart';
 import 'package:flutterdatingapp/setting_screen.dart';
 import 'package:flutterdatingapp/text_reader.dart';
+import 'package:flutterdatingapp/video_player.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import './color_scheme.dart';
 import './common_widgets.dart';
@@ -37,6 +38,8 @@ class StarGrading extends StatefulWidget
 
 class _StartGrading extends State<StarGrading>
 {
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -77,8 +80,6 @@ class _StartGrading extends State<StarGrading>
       );
   }
 
-
-
 }
 
 
@@ -110,6 +111,7 @@ class _GradingPage extends State<GradingPage>
         return AccountInfo.createAccountInfo("", "No account found",
             "There are no more accounts available at the moment.",
             "https://firebasestorage.googleapis.com/v0/b/grading-dating-app.appspot.com/o/error-image.png?alt=media&token=3ab22d8d-334f-420a-80dc-4dd13ad362be",
+            "",
             0, 0);
       }
     else
@@ -121,16 +123,20 @@ class _GradingPage extends State<GradingPage>
 
   Widget getImage(String location)
   {
-    if (location == "")
+    if (isLoading == true)
       {
-        return CircularProgressIndicator();
+        return Center(
+          child: CircularProgressIndicator(),
+        );
       }
-    else
-      {
+    else {
         return
           CachedNetworkImage(
             imageUrl: location,
-            placeholder: (context, url) => CircularProgressIndicator(),
+            placeholder: (context, url) =>
+                Center(
+                  child: CircularProgressIndicator(),
+                ),
             errorWidget: (context, url, error) => Icon(MdiIcons.alertCircle),
           );
       }
@@ -138,16 +144,20 @@ class _GradingPage extends State<GradingPage>
 
   Widget getImageAvatar(String location)
   {
-    if (location == "")
+    if (isLoading == true)
     {
-      return CircularProgressIndicator();
+      return Center(
+        child: CircularProgressIndicator(),
+      );
     }
     else
     {
       return
         CachedNetworkImage(
           imageUrl: location,
-          placeholder: (context, url) => CircularProgressIndicator(),
+          placeholder: (context, url) => Center(
+            child: CircularProgressIndicator(),
+          ),
           errorWidget: (context, url, error) => Icon(MdiIcons.alertCircle),
         );
 
@@ -161,6 +171,7 @@ class _GradingPage extends State<GradingPage>
 
     if (isSetupRequired == true)
       {
+        isLoading = true;
         setup();
         isSetupRequired = false;
       }
@@ -196,6 +207,7 @@ class _GradingPage extends State<GradingPage>
     },);
   }
 
+  VideoPlayer videoPlayer = VideoPlayer();
   Widget gradingBody(BuildContext context) {
     return
       Dismissible(
@@ -204,7 +216,7 @@ class _GradingPage extends State<GradingPage>
 
             SliverAppBar(
               title: Text(getAccount(displayedOption).name),
-              actions: [
+              /*actions: [
                 IconButton(
                     icon: Icon(
                       MdiIcons.chat,
@@ -215,7 +227,7 @@ class _GradingPage extends State<GradingPage>
                         context, MaterialPageRoute(builder: (context) => ChatScreen()));
                   },
                 ),
-              ],
+              ],*/
 
               backgroundColor: primary,
               expandedHeight: MediaQuery
@@ -225,7 +237,7 @@ class _GradingPage extends State<GradingPage>
               //80% screen height
 
               flexibleSpace: FlexibleSpaceBar(
-                background: getImage(getAccount(displayedOption).imageLocation),
+                background: displayMedia(),
               ),
             ),
             SliverFixedExtentList(
@@ -237,6 +249,7 @@ class _GradingPage extends State<GradingPage>
                 [
                   Container(
                       child: Column(children: <Widget>[
+                        swapMedia(),
                         Text(getAccount(displayedOption).name),//Name
                         Text(getAccount(displayedOption).age.toString()),//age
                         Text(getAccount(displayedOption).distance.toString()),//location
@@ -276,6 +289,73 @@ class _GradingPage extends State<GradingPage>
           }
         },
       );
+  }
+
+  bool isPictureDisplayed = true;
+  Widget swapMedia()
+  {
+    if (isPictureDisplayed == true)
+      {
+        return IconButton(icon: Icon(MdiIcons.video, color: secondary, size: 36,), onPressed: (){
+          if (getAccount(displayedOption).videoLocation != "")
+            {
+              isPictureDisplayed = false;
+              setState(() {
+
+              });
+            }
+        },);
+      }
+    else
+      {
+        return IconButton(icon: Icon(MdiIcons.image, color: secondary, size: 36,), onPressed: (){
+          videoPlayer.stop();
+          isPictureDisplayed = true;
+          setState(() {
+
+          });
+        },);
+      }
+  }
+
+  Widget displayMedia()
+  {
+    if (isPictureDisplayed == true)
+      {
+        return getImage(getAccount(displayedOption).imageLocation);
+      }
+    else
+      {
+        if (isVideoAvailable == false)
+          {
+            setupVideo();
+            return videoPlayer.videoLoading();
+          }
+        else
+          {
+            return videoPlayer.videoDisplay();
+          }
+
+      }
+
+  }
+
+  bool isVideoAvailable = false;
+  Future<void> setupVideo()
+  async {
+    String videoURL = getAccount(displayedOption).videoLocation;
+
+    await videoPlayer.setup(videoURL);
+
+    setState(() {
+      isVideoAvailable = true;
+    });
+  }
+
+  @override
+  void dispose() {
+    videoPlayer.dispose();
+    super.dispose();
   }
 
   Widget gradingMenu() {
@@ -446,6 +526,7 @@ class _GradingPage extends State<GradingPage>
     ), height: 80, color: primaryLight,);
   }
 
+  bool isLoading = true;
   void setup() async
   {
     Searcher searchManager = Searcher();
@@ -453,14 +534,11 @@ class _GradingPage extends State<GradingPage>
     List<AccountInfo> foundAccounts = await searchManager.getOnlineAccounts();
     print("search result length is " + foundAccounts.length.toString());
 
-    print("displayed accounts length is " + accounts.length.toString());
     accounts.clear();
-    print("displayed accounts length is " + accounts.length.toString());
     accounts.addAll(foundAccounts);
-    print("displayed accounts length is " + accounts.length.toString());
 
     setState(() {
-
+      isLoading = false;
     });
   }
 

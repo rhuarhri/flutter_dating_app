@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutterdatingapp/database_management_code/online_database.dart';
+import 'package:flutterdatingapp/record_video.dart';
 import '../description_analyzer.dart';
 import '../interests_screen_code/interests_screen.dart';
 import '../common_widgets.dart';
@@ -54,7 +55,8 @@ class DescriptionScreen extends StatelessWidget {
     bool isDone = await onlineManager.addUserDescription(description);
     //isDone makes the app await
 
-    Navigator.push(context, MaterialPageRoute(builder: (context) => InterestsScreen()));
+    Navigator.push(context, MaterialPageRoute(builder: (context) =>
+        VideoRecorderScreen(description: description,)));
 
   }
 

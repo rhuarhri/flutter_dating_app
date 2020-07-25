@@ -80,6 +80,19 @@ class UpdateOnlineDatabase
 
   }
 
+  void updateVideo(File video) async
+  {
+    UserInfo user = await DBProvider.db.getUser();
+    String userId = user.onlineLocation;
+    String fileName = userId + "Video";
+
+    StorageReference ref = FirebaseStorage.instance.ref().child(fileName);
+    ref.delete();
+
+    AddOnlineManager addManager = AddOnlineManager();
+    addManager.addUserImage(video);
+  }
+
   void updateLikedInterest(String documentId, int likes)
   {
     databaseReference.collection("interests").document(documentId).updateData(
