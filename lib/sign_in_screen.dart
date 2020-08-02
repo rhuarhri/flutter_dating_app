@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutterdatingapp/authentication_manager.dart';
 import 'package:flutterdatingapp/common_widgets.dart';
-import 'package:flutterdatingapp/screen_recorder.dart';
+import 'package:flutterdatingapp/screen_timer.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'account_screen_code/account_screen.dart';
@@ -14,6 +14,8 @@ class SignInScreen extends StatelessWidget{
   bool isSetupRequired = true;
   bool checkingLogin = true;
   AuthManager signUpManager = AuthManager();
+
+  ScreenTimer screenTimer = ScreenTimer();
 
   final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
 
@@ -82,7 +84,7 @@ class SignInScreen extends StatelessWidget{
 
   void toGradingScreen(BuildContext context)
   {
-    Recorder().start();
+
 
     Navigator.push(
         context,
@@ -143,7 +145,7 @@ class SignInScreen extends StatelessWidget{
           );
         }
 
-        Recorder().showStartRecordingAlert(context);
+
       },
       backgroundColor: secondary,);
   }

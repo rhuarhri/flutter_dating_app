@@ -3,12 +3,13 @@ import 'package:flutter/material.dart';
 import 'package:flutterdatingapp/database_management_code/internal/DataModels.dart';
 import 'package:flutterdatingapp/database_management_code/database.dart';
 import 'package:flutterdatingapp/database_management_code/online_database.dart';
+import 'package:flutterdatingapp/screen_timer.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 
 import '../color_scheme.dart';
 import '../common_widgets.dart';
 import '../grading_screen.dart';
-import '../screen_recorder.dart';
+//import '../screen_recorder.dart';
 
 class InterestsScreen extends StatelessWidget
 {
@@ -31,6 +32,19 @@ class InterestScreen extends StatefulWidget
 
 class _InterestScreen extends State<InterestScreen>
 {
+  ScreenTimer screenTimer = ScreenTimer();
+
+  @override
+  void initState() {
+    screenTimer.start("interest screen");
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    screenTimer.stop();
+    super.dispose();
+  }
 
   TextEditingController likedController = TextEditingController();
   List<DescriptionValue> liked = [];
@@ -218,7 +232,7 @@ class _InterestScreen extends State<InterestScreen>
 
   void toNewScreen(BuildContext context) async
   {
-    Recorder().start();
+    //Recorder().start();
     await OnlineDatabaseManager().addLikesAndHates();
     Navigator.push(context, MaterialPageRoute(builder: (context) => GradingScreen()));
   }

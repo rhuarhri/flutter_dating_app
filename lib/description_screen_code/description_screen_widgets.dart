@@ -7,6 +7,7 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:speech_to_text/speech_recognition_result.dart';
 import '../color_scheme.dart';
 import '../common_widgets.dart';
+import '../screen_timer.dart';
 
 class DescriptionScreenWidgets
 {
@@ -39,6 +40,20 @@ int characterAmount = 0;
 
 class _DescriptionBody extends State<DescriptionBody>
 {
+  ScreenTimer screenTimer = ScreenTimer();
+
+  @override
+  void initState() {
+    screenTimer.start("description screen");
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    screenTimer.stop();
+    super.dispose();
+  }
+
   Function onCompleteAction;
   BuildContext screenContext;
   _DescriptionBody(this.onCompleteAction, this.screenContext);

@@ -62,7 +62,7 @@ class MatchManager
       _deleteMatchOnline(deleteAccount);
     }
 
-    if (grade > 4)//i.e. only the highest scores
+    if (grade > 3)//i.e. only the highest scores
       {
        //addDescriptionValue(accountId);
       }

@@ -4,6 +4,7 @@ import 'package:flutterdatingapp/account_screen_code/account_update_screen.dart'
 import 'package:flutterdatingapp/database_management_code/database.dart';
 import 'package:flutterdatingapp/description_screen_code/description_update_screen.dart';
 import 'package:flutterdatingapp/picture_screen_code/picture_update_screen.dart';
+import 'package:flutterdatingapp/screen_timer.dart';
 import 'package:flutterdatingapp/search_manager.dart';
 import 'package:flutterdatingapp/setting_screen.dart';
 import 'package:flutterdatingapp/text_reader.dart';
@@ -48,7 +49,7 @@ class _StartGrading extends State<StarGrading>
       Row(
         mainAxisAlignment: MainAxisAlignment.center,
       mainAxisSize: MainAxisSize.min,
-      children: List.generate(3, (index) {
+      children: List.generate(4, (index) {
         return
             IconButton(icon: Icon(
               index < _currentGrade ? MdiIcons.star : MdiIcons.starOutline,
@@ -94,6 +95,13 @@ class GradingPage extends StatefulWidget
 
 class _GradingPage extends State<GradingPage>
 {
+  ScreenTimer screenTimer = ScreenTimer();
+
+  /*
+  @override
+  void initState() {
+    super.initState();
+  }*/
 
   List<AccountInfo> accounts = [];
 
@@ -109,7 +117,8 @@ class _GradingPage extends State<GradingPage>
     if (accounts.length <= 0 || accounts.length <= index)
       {
         return AccountInfo.createAccountInfo("", "No account found",
-            "There are no more accounts available at the moment.",
+            "There are no more accounts available at the moment. " +
+                "Go to the chat screen by pressing the speak bubble at the top right corner.",
             "https://firebasestorage.googleapis.com/v0/b/grading-dating-app.appspot.com/o/error-image.png?alt=media&token=3ab22d8d-334f-420a-80dc-4dd13ad362be",
             "",
             0, 0);
@@ -164,6 +173,15 @@ class _GradingPage extends State<GradingPage>
     }
   }
 
+  void showSwipeInstruction(BuildContext context)
+  {
+    _scaffoldKey.currentState.showSnackBar(
+      SnackBar(content: Text("Swipe right of like, left for hate",), backgroundColor: secondaryDark,)
+    );
+  }
+
+  final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
+
   bool isSetupRequired = true;
 
   @override
@@ -172,11 +190,12 @@ class _GradingPage extends State<GradingPage>
     if (isSetupRequired == true)
       {
         isLoading = true;
-        setup();
+        setup(context);
         isSetupRequired = false;
       }
 
     return Scaffold(
+      key: _scaffoldKey,
       drawer: gradingMenu(),
       body: gradingBody(context),
       bottomNavigationBar: footer(),
@@ -216,7 +235,7 @@ class _GradingPage extends State<GradingPage>
 
             SliverAppBar(
               title: Text(getAccount(displayedOption).name),
-              /*actions: [
+              actions: [
                 IconButton(
                     icon: Icon(
                       MdiIcons.chat,
@@ -227,7 +246,7 @@ class _GradingPage extends State<GradingPage>
                         context, MaterialPageRoute(builder: (context) => ChatScreen()));
                   },
                 ),
-              ],*/
+              ],
 
               backgroundColor: primary,
               expandedHeight: MediaQuery
@@ -355,6 +374,7 @@ class _GradingPage extends State<GradingPage>
   @override
   void dispose() {
     videoPlayer.dispose();
+    screenTimer.stop();
     super.dispose();
   }
 
@@ -477,7 +497,7 @@ class _GradingPage extends State<GradingPage>
               print("get more accounts");
 
               DBProvider.db.addHistory(lastId);
-              setup();
+              setup(context);
             }
 
             Navigator.pop(context);
@@ -527,7 +547,7 @@ class _GradingPage extends State<GradingPage>
   }
 
   bool isLoading = true;
-  void setup() async
+  void setup(BuildContext context) async
   {
     Searcher searchManager = Searcher();
 
@@ -539,6 +559,8 @@ class _GradingPage extends State<GradingPage>
 
     setState(() {
       isLoading = false;
+      showSwipeInstruction(context);
+      screenTimer.start("grading screen");
     });
   }
 
