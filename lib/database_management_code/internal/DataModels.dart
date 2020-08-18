@@ -21,6 +21,7 @@ class UserInfo
   int minAge;
   int maxAge;
   String lookingFor;
+  String gender;
   //These two values will be needed every time the app searches for people
   //and are stored in the internal database because they are used so frequently.
 
@@ -40,6 +41,7 @@ class UserInfo
     this.minAge,
     this.maxAge,
     this.lookingFor,
+    this.gender,
     this.descriptionStyle,
     this.distance,
     this.accuracy,
@@ -53,6 +55,7 @@ class UserInfo
     "minAge":minAge,
     "maxAge":maxAge,
     "lookingFor": lookingFor,
+    "gender":gender,
     "descriptionStyle": descriptionStyle,
     "distance":distance,
     "accuracy":accuracy,
@@ -65,6 +68,7 @@ class UserInfo
     minAge: json["minAge"],
     maxAge: json["maxAge"],
     lookingFor: json["lookingFor"],
+    gender: json["gender"],
     descriptionStyle: json["descriptionStyle"],
     distance: json["distance"],
     accuracy: json["accuracy"],
@@ -278,6 +282,39 @@ class Messages
   factory Messages.fromMap(Map<String, dynamic> json) => new Messages(
     id: json["id"],
     messageAmount: json["messageAmount"],
+  );
+
+}
+
+Messages categoryFromJson(String str) {
+  final jsonData = json.decode(str);
+  return Messages.fromMap(jsonData);
+}
+
+String categoryToJson(Messages data) {
+  final dyn = data.toMap();
+  return json.encode(dyn);
+}
+
+/*
+This class represents the number of messages the user can send. They can get more
+through a reward ad.
+ */
+class Category
+{
+  int id;
+  String name;
+
+  Category({this.id, this.name});
+
+  Map<String, dynamic> toMap() => {
+    "id": id,
+    "name": name,
+  };
+
+  factory Category.fromMap(Map<String, dynamic> json) => new Category(
+    id: json["id"],
+    name: json["name"],
   );
 
 }

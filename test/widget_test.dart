@@ -550,6 +550,19 @@ void main() {
 
     });
 
+    test("split string test", (){
+
+      String input = "/Arts & Entertainment/TV & Video/TV Shows & Programs";
+
+      List<String> result = input.split("/");
+
+      result.forEach((element) {
+        print("result element is " + element);
+      });
+
+
+    });
+
 
   });
 
@@ -562,7 +575,7 @@ void main() {
 
       DescriptionAnalyzer analyzer = DescriptionAnalyzer();
 
-      String result = analyzer.analyzeDescriptionStyle(0, 0, 0, text, 400);
+      String result = analyzer.recordDescriptionStyle(0, 0, 0, text, 400);
 
       expect(result, "informal");
 
@@ -576,7 +589,7 @@ void main() {
 
       DescriptionAnalyzer analyzer = DescriptionAnalyzer();
 
-      String result = analyzer.analyzeDescriptionStyle(0, 0, 6, text, 400);
+      String result = analyzer.recordDescriptionStyle(0, 0, 6, text, 400);
 
       expect(result, "formal");
 
@@ -589,7 +602,7 @@ void main() {
 
       DescriptionAnalyzer analyzer = DescriptionAnalyzer();
 
-      String result = analyzer.analyzeDescriptionStyle(0, 0, 2, text, 400);
+      String result = analyzer.recordDescriptionStyle(0, 0, 2, text, 400);
 
       expect(result, "informal");
 
@@ -605,7 +618,7 @@ void main() {
 
       int abbreviations = 1;
 
-      String result = analyzer.analyzeDescriptionStyle(0, abbreviations, 6, text, 400);
+      String result = analyzer.recordDescriptionStyle(0, abbreviations, 6, text, 400);
 
       expect(result, "informal");
 
@@ -620,7 +633,7 @@ void main() {
 
       int mistakes = 2;
 
-      String result = analyzer.analyzeDescriptionStyle(mistakes, 0, 6, text, 400);
+      String result = analyzer.recordDescriptionStyle(mistakes, 0, 6, text, 400);
 
       expect(result, "informal");
 
@@ -635,7 +648,7 @@ void main() {
 
       int maxDescriptionSize = 1000;
 
-      String result = analyzer.analyzeDescriptionStyle(0, 0, 6, text, maxDescriptionSize);
+      String result = analyzer.recordDescriptionStyle(0, 0, 6, text, maxDescriptionSize);
 
       expect(result, "informal");
 

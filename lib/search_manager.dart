@@ -18,8 +18,9 @@ class AccountInfo
   String videoLocation;
   int age;
   int distance;
+  int matchScore;
 
-  AccountInfo.createAccountInfo(this.accountId, this.name, this.description, this.imageLocation, this.videoLocation, this.age, this.distance);
+  AccountInfo.createAccountInfo(this.accountId, this.name, this.description, this.imageLocation, this.videoLocation, this.age, this.distance, this.matchScore);
 
   AccountInfo();
 
@@ -125,7 +126,7 @@ class Searcher
           if (_likedAccounts.contains(element.documentID) == true) {
             //if the current account likes the user then it will be shown to the user without filtering
             //as it will most likely produce similar results
-            _addToResult(element, usersPosition);
+            _addToResult(element, usersPosition, 100);
           }
           else {
             List<String> accountHates = dynamicListToStringList(
@@ -159,7 +160,7 @@ class Searcher
               //accuracy is determined by the user because if it is too high then the user will get
               //little or no match
               print("it a match");
-              _filteredResult.add(await _addToResult(element, usersPosition));
+              _filteredResult.add(await _addToResult(element, usersPosition, matchScore));
             }
             else {
               print("not a match");
@@ -194,7 +195,7 @@ class Searcher
     return result;
   }
 
-  Future<AccountInfo> _addToResult(DocumentSnapshot data, Position usersPosition) async
+  Future<AccountInfo> _addToResult(DocumentSnapshot data, Position usersPosition, int matchScore) async
   {
     double accountLat = data.data["lat"];
     double accountLong = data.data["long"];
@@ -211,6 +212,8 @@ class Searcher
     matchedAccount.videoLocation = userBasicInfo.data["video"];
     matchedAccount.description = userBasicInfo.data["description"];
     matchedAccount.name = userBasicInfo.data["name"];
+
+    matchedAccount.matchScore = matchScore;
 
     return matchedAccount;
   }

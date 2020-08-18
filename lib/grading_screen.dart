@@ -121,7 +121,7 @@ class _GradingPage extends State<GradingPage>
                 "Go to the chat screen by pressing the speak bubble at the top right corner.",
             "https://firebasestorage.googleapis.com/v0/b/grading-dating-app.appspot.com/o/error-image.png?alt=media&token=3ab22d8d-334f-420a-80dc-4dd13ad362be",
             "",
-            0, 0);
+            0, 0, 0);
       }
     else
       {
@@ -226,6 +226,12 @@ class _GradingPage extends State<GradingPage>
     },);
   }
 
+  /*
+  Widget _matchScoreDisplay()
+  {
+    return Container(child: Text(getAccount(displayedOption).matchScore.toString()),);
+  }*/
+
   VideoPlayer videoPlayer = VideoPlayer();
   Widget gradingBody(BuildContext context) {
     return
@@ -269,6 +275,7 @@ class _GradingPage extends State<GradingPage>
                   Container(
                       child: Column(children: <Widget>[
                         swapMedia(),
+                        //_matchScoreDisplay(),
                         Text(getAccount(displayedOption).name),//Name
                         Text(getAccount(displayedOption).age.toString()),//age
                         Text(getAccount(displayedOption).distance.toString()),//location

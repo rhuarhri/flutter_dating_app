@@ -232,12 +232,10 @@ class _InterestScreen extends State<InterestScreen>
 
   void toNewScreen(BuildContext context) async
   {
-    //Recorder().start();
+    screenTimer.stop();
     await OnlineDatabaseManager().addLikesAndHates();
     Navigator.push(context, MaterialPageRoute(builder: (context) => GradingScreen()));
   }
-
-
 
   Widget listHeader(Widget icon, String name, Function action, TextEditingController controller)
   {

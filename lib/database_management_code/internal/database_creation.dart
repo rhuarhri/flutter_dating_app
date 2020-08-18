@@ -11,6 +11,7 @@ class DatabaseCreator
     _createBlockedTable(db);
     _createMatchesTable(db);
     _createMessageAmountTable(db);
+    _createCategoryTable(db);
   }
 
   void _createUserInfoTable(Database db) async
@@ -21,6 +22,7 @@ class DatabaseCreator
         "minAge INTEGER," +
         "maxAge INTEGER," +
         "lookingFor TEXT," +
+        "gender TEXT," +
         "descriptionStyle TEXT," +
         "faceShape TEXT, " +
         "accuracy INTEGER,"
@@ -74,6 +76,14 @@ class DatabaseCreator
     db.execute("CREATE TABLE Messages (" +
         "id INTEGER PRIMARY KEY AUTOINCREMENT," +
         "messageAmount INTEGER )"
+    );
+  }
+  
+  void _createCategoryTable(Database db)
+  {
+    db.execute("CREATE TABLE Categories (" +
+        "id INTEGER PRIMARY KEY AUTOINCREMENT," +
+        "name TEXT )"
     );
   }
 

@@ -29,12 +29,13 @@ class AddOnlineManager
       "mustHaves":[],
       "mustNotHaves":[],
       "descriptionStyle":"",
+      "categories":[],
       "faceShape":"",
       "lastUpdate": Timestamp.now(),
 
     }).then((value) => {
 
-      _addToInternalDatabase(value.documentID, age, lookingFor, lat, long),
+      _addToInternalDatabase(value.documentID, age, gender, lookingFor, lat, long),
 
       Firestore.instance.collection("users").document(value.documentID).collection("basicInfo").add({
         "name":name,
@@ -45,13 +46,14 @@ class AddOnlineManager
     });
   }
 
-  void _addToInternalDatabase(String id, int age, String lookingFor, double latitude, double longitude)
+  void _addToInternalDatabase(String id, int age, String gender, String lookingFor, double latitude, double longitude)
   {
     UserInfo userInfo = UserInfo();
     userInfo.onlineLocation = id;
     userInfo.minAge = 18;
     userInfo.maxAge = age + 5;
     userInfo.lookingFor = lookingFor.toLowerCase();
+    userInfo.gender = gender.toLowerCase();
     userInfo.descriptionStyle = "";
     userInfo.distance = 100;
     userInfo.accuracy = 20;
@@ -333,5 +335,20 @@ class AddOnlineManager
       "likes":liked,
       "hates":hated,
     });
+  }
+
+  void addCategories() async
+  {
+    UserInfo user = await DBProvider.db.getUser();
+    String userId = user.onlineLocation;
+
+    List<String> categories = await DBProvider.db.getAllCategories();
+
+    databaseReference.collection("users").document(userId).updateData(
+      {
+        "categories":categories,
+      }
+    );
+
   }
 }

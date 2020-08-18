@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:flutterdatingapp/database_management_code/internal/blocked_manager.dart';
+import 'package:flutterdatingapp/database_management_code/internal/category_manager.dart';
 import 'package:flutterdatingapp/database_management_code/internal/matches_table_manager.dart';
 import 'package:flutterdatingapp/database_management_code/internal/messages_table_manager.dart';
 
@@ -315,6 +316,22 @@ class DBProvider
   {
     final db = await database;
     return _getFromMessages.getCurrentMessageAmount(db);
+  }
+
+  GetFromCategories _getFromCategories = GetFromCategories();
+  AddToCategories _addToCategories = AddToCategories();
+  UpdateFromCategories _updateFromCategories = UpdateFromCategories();
+
+  void addCategories(List<String> userCategories) async
+  {
+    final db = await database;
+    _addToCategories.addCategories(db, userCategories);
+  }
+
+  Future<List<String>> getAllCategories() async
+  {
+    final db = await database;
+    return _getFromCategories.getAllCategories(db);
   }
 
   //delete all information

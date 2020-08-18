@@ -85,33 +85,37 @@ class GetOnlineManager
 
     List<String> searchForLiked = [];
 
-    //TODO uncomment in the future. But it is too unlikely that any match will be found.
-    //firestore's array contains query can only accept up to 10 items
-    //as result the u=number of the user's likes is limited here.
-    //if (userLikedItem.isNotEmpty == true) {
-      //for (int i = 0; i < 10 || i < userLikedItem.length; i++) {
-        //searchForLiked.add(userLikedItem[i].name);
-      //}
-
-      // However it may be wise no to since the search algorithm will handle it
-      //query.where("likes", arrayContainsAny: searchForLiked);
-    //}
-
 
     /*The query is coded like this because of the reason explained here
   https://stackoverflow.com/questions/50316462/flutter-firestore-compound-query*/
 
     oldQuery = databaseReference.collection("users");
+
+    //get accounts within age range
     newQuery = oldQuery.where("age", isGreaterThanOrEqualTo: user.minAge);
-    oldQuery = newQuery;
-    newQuery = oldQuery.where("gender", isEqualTo: user.lookingFor.toLowerCase());
     oldQuery = newQuery;
     newQuery = oldQuery.where("age", isLessThanOrEqualTo: user.maxAge);
     oldQuery = newQuery;
+
+    //get accounts with gender
+    newQuery = oldQuery.where("gender", isEqualTo: user.lookingFor.toLowerCase());
+    oldQuery = newQuery;
+    oldQuery = newQuery.where("lookingFor", isEqualTo: user.gender.toLowerCase());
+    oldQuery = newQuery;
+
+    //get accounts in categories
+    List<String> userCategories = await DBProvider.db.getAllCategories();
+    //it only gets the first in the list as this means a match can be found at this stage of development
+    //as there are not enough accounts to cover every possibility
+    //in the future it will use all the user's categories
+    //newQuery = oldQuery.where("categories", arrayContainsAny: [userCategories.first]);
+    oldQuery = newQuery;
+
     //Get all accounts that were active in the past 30 days.
     //accounts that were not active in that time are considered not using the app
     DateTime inactivityLimit = DateTime.now().subtract(Duration(days: 30));
     newQuery = oldQuery.where("lastUpdate", isGreaterThanOrEqualTo: Timestamp.fromDate(inactivityLimit));
+
     newQuery = oldQuery.orderBy("age");
     oldQuery = newQuery;
     //The grading screen only displays 3 options at a time, so limiting it to 3 means that the

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutterdatingapp/database_management_code/online_database.dart';
 
-import 'package:flutter/cupertino.dart';
+//import 'package:flutter/cupertino.dart';
 import 'package:googleapis_beta/language/v1beta2.dart';
 import 'package:googleapis_auth/auth_io.dart';
 
@@ -18,9 +19,11 @@ String apiEndPoint = "https://language.googleapis.com/v1/documents:analyzeSentim
 class DescriptionAnalyzer
 {
 
+  double confidenceFreshHold = 0.60;
+
   String descriptionStyle = "";
 
-  String analyzeDescriptionStyle(int mistakes, int abbreviation, int punctuation, String description, int maxDescriptionLength)
+  String recordDescriptionStyle(int mistakes, int abbreviation, int punctuation, String description, int maxDescriptionLength)
   {
     /*people with similar writing styles might be able to understand each other more.
     For example, if two people use abbreviations like lol or omg
@@ -90,13 +93,87 @@ class DescriptionAnalyzer
     return result;
   }
 
+  analyzeDescriptionStyle(AnalyzeSyntaxResponse data, String description)
+  {
+    int abbreviation = 0;
+    int mistakes = 0;
+    int punctuation = 0;
+
+    data.tokens.forEach((element) {
+
+      if (element.dependencyEdge.label == "ABBREV")
+      {
+        //ABBREV stands for abbreviation
+        abbreviation++;
+      }
+
+      if (element.partOfSpeech.tag == "X")
+      {
+        //X stand for mistake or the natural language processing could not identify it
+        mistakes++;
+      }
+      else if (element.partOfSpeech.tag == "PUNCT")
+      {
+        //PUNCT stands for punctuation
+        punctuation++;
+      }
+
+
+
+    });
+
+    print("number of abbreviation found is " + abbreviation.toString() + "");
+    print("number of mistakes found is " + mistakes.toString() + "");
+    print("number of punctuation found is " + punctuation.toString() + "");
+
+    int maxDescriptionLength = 1000;
+    String style = recordDescriptionStyle(mistakes, abbreviation, punctuation, description, maxDescriptionLength);
+
+    DBProvider.db.updateDescriptionStyle(style);
+  }
+
+  analyzeCategories(List<ClassifyTextResponse> data) async
+  {
+
+    List<String> splitUpCategories = [];
+
+    if (data.isNotEmpty) {
+      data.forEach((responses) {
+        responses.categories.forEach((category) {
+          print("category is " + category.name + "");
+          print("confidence is " + category.confidence.toStringAsFixed(3) + "");
+
+          if (category.confidence >= confidenceFreshHold)
+            {
+              List<String> foundCategories = category.name.split("/");
+              foundCategories.forEach((category) {
+                if (category != "")
+                  {
+                    splitUpCategories.add(category);
+                  }
+              });
+            }
+          else
+            {
+              splitUpCategories = ["blank"];
+            }
+
+        });
+      });
+    }
+    else
+      {
+        splitUpCategories = ["blank"];
+      }
+
+    DBProvider.db.addCategories(splitUpCategories);
+    OnlineDatabaseManager().addCategoriesOnline();
+  }
 
   Future<bool> analyze(String description, BuildContext context) async
   {
 
-
     LanguageApi langAPI = LanguageApi(clientViaApiKey(apiKey));
-
 
     Locale myLocal = Localizations.localeOf(context);
     String language = myLocal.languageCode;
@@ -143,48 +220,19 @@ class DescriptionAnalyzer
 
       }
 
-    int abbreviation = 0;
-    int mistakes = 0;
-    int punctuation = 0;
-
     AnalyzeSyntaxRequest syntaxRequest = AnalyzeSyntaxRequest();
     syntaxRequest.document = input;
 
     AnalyzeSyntaxResponse syntaxData =
         await langAPI.documents.analyzeSyntax(syntaxRequest);
 
-    syntaxData.tokens.forEach((element) {
+    analyzeDescriptionStyle(syntaxData, description);
 
-      if (element.dependencyEdge.label == "ABBREV")
-        {
-          //ABBREV stands for abbreviation
-          abbreviation++;
-        }
-
-      if (element.partOfSpeech.tag == "X")
-        {
-          //X stand for mistake or the natural language processing could not identify it
-          mistakes++;
-        }
-      else if (element.partOfSpeech.tag == "PUNCT")
-        {
-          //PUNCT stands for punctuation
-          punctuation++;
-        }
-
-
-
-    });
-
-    print("number of abbreviation found is " + abbreviation.toString() + "");
-    print("number of mistakes found is " + mistakes.toString() + "");
-    print("number of punctuation found is " + punctuation.toString() + "");
-
-    int maxDescriptionLength = 1000;
-    descriptionStyle = analyzeDescriptionStyle(mistakes, abbreviation, punctuation, description, maxDescriptionLength);
-
-    DBProvider.db.updateDescriptionStyle(descriptionStyle);
-
+    ClassifyTextRequest categoryRequest = ClassifyTextRequest();
+    categoryRequest.document = input;
+    List<ClassifyTextResponse> categoryData =
+    await langAPI.documents.classifyText(categoryRequest).asStream().toList();
+    analyzeCategories(categoryData);
 
   }
 

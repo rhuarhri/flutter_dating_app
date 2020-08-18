@@ -205,4 +205,9 @@ class OnlineDatabaseManager
 
   }
 
+  void addCategoriesOnline()
+  {
+   addOnlineManager.addCategories();
+  }
+
 }
