@@ -166,6 +166,11 @@ class DescriptionAnalyzer
         splitUpCategories = ["blank"];
       }
 
+    if (splitUpCategories.isEmpty)
+      {
+        splitUpCategories = ["blank"];
+      }
+
     DBProvider.db.addCategories(splitUpCategories);
     OnlineDatabaseManager().addCategoriesOnline();
   }

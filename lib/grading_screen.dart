@@ -8,12 +8,14 @@ import 'package:flutterdatingapp/screen_timer.dart';
 import 'package:flutterdatingapp/search_manager.dart';
 import 'package:flutterdatingapp/setting_screen.dart';
 import 'package:flutterdatingapp/text_reader.dart';
+import 'package:flutterdatingapp/user_search_bar.dart';
 import 'package:flutterdatingapp/video_player.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import './color_scheme.dart';
 import './common_widgets.dart';
 import './chat_screen.dart';
 import 'match_manager.dart';
+import 'account_info.dart';
 
 //TODO add a star grading widget under the image just above the description
 //This will allow the user to grade the account as they are looking at it.
@@ -96,6 +98,9 @@ class GradingPage extends StatefulWidget
 class _GradingPage extends State<GradingPage>
 {
   ScreenTimer screenTimer = ScreenTimer();
+
+  SearchBar searchBar = SearchBar();
+
 
   /*
   @override
@@ -385,12 +390,69 @@ class _GradingPage extends State<GradingPage>
     super.dispose();
   }
 
+  /*
+  Widget searchBar()
+  {
+    return Container(
+      //color: primaryLight,
+      height: 60,
+      child: Row(children: [
+        Flexible( child:
+        Container(
+          //height:50,
+          //color: Colors.white,
+          child:
+      TextField(
+          //controller: userNameController,
+          decoration: InputDecoration(
+              border: InputBorder.none,
+              hintText: "search"
+          )
+      ),
+        height: 50,
+        decoration: BoxDecoration(
+            color: Colors.white,
+            border: Border(bottom: BorderSide(color: primaryDark))
+        ),
+        margin: EdgeInsets.all(16.0),
+      ),
+          fit: FlexFit.tight,
+          flex: 4,
+        ),
+
+      Flexible(child:
+      IconButton(icon: Icon(MdiIcons.magnify), onPressed: (){},),
+        fit: FlexFit.loose,
+        flex: 1,
+      )
+
+      ],),
+    );
+  }*/
+
   Widget gradingMenu() {
     return Drawer(
 
       child: ListView(
         children: <Widget>[
           drawerHeader(),
+          searchBar.getWidget((){
+            searchBar.findAccounts().then((value) => (){
+              setState(() {
+
+              });
+            });
+          }),
+          searchBar.searchResultsDisplay(
+              (){
+                searchBar.getUser().then((value){
+                  accounts.insert(displayedOption, value);
+                  setState(() {
+
+                  });
+                });
+              }
+          ),
           FlatButton(
             color: primary,
             child:

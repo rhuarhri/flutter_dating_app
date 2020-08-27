@@ -125,16 +125,7 @@ class GetOnlineManager
     return newQuery;
   }
   
-  Future<DocumentSnapshot> getUserDescription(String id) async
-  {
-    DocumentSnapshot result;
-    QuerySnapshot foundData = await databaseReference.collection("users").document(id)
-        .collection("basicInfo").getDocuments();
 
-    result = foundData.documents[0];
-
-    return result;
-  }
 
   Future<List<String>> getMatchedUsers() async
   {

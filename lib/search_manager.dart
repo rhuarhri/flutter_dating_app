@@ -6,26 +6,10 @@ import 'database_management_code/online_database.dart';
 import 'database_management_code/database.dart';
 import 'database_management_code/internal/DataModels.dart';
 
+import 'account_info.dart';
+
 double searchLikeFresherHold = 0.5;
 double searchHateFreshHold = -0.5;
-
-class AccountInfo
-{
-  String accountId;
-  String name;
-  String description;
-  String imageLocation;
-  String videoLocation;
-  int age;
-  int distance;
-  int matchScore;
-
-  AccountInfo.createAccountInfo(this.accountId, this.name, this.description, this.imageLocation, this.videoLocation, this.age, this.distance, this.matchScore);
-
-  AccountInfo();
-
-}
-
 
 class Searcher
 {
@@ -347,4 +331,5 @@ class Searcher
 
     return finalScore.round();
   }
+
 }

@@ -1,9 +1,12 @@
-import 'package:flutterdatingapp/database_management_code/online/add_online_data.dart';
 import 'package:flutterdatingapp/database_management_code/online/get_online_data.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutterdatingapp/database_management_code/online/manage_categories_manager.dart';
+import 'package:flutterdatingapp/database_management_code/online/manage_description_online.dart';
+import 'package:flutterdatingapp/database_management_code/online/manage_image_online.dart';
+import 'package:flutterdatingapp/database_management_code/online/manage_user_online.dart';
+import 'package:flutterdatingapp/database_management_code/online/manage_user_values_online.dart';
+import 'package:flutterdatingapp/database_management_code/online/manage_video_online.dart';
 import 'dart:io';
-
-import 'package:flutterdatingapp/database_management_code/online/update_online_database.dart';
 
 import 'database.dart';
 import 'internal/DataModels.dart';
@@ -61,84 +64,86 @@ class OnlineDatabaseManager
   }
 
   final databaseReference = Firestore.instance;
-  AddOnlineManager addOnlineManager = AddOnlineManager();
-  UpdateOnlineDatabase updateManager = UpdateOnlineDatabase();
+  //AddOnlineManager addOnlineManager = AddOnlineManager();
+  //UpdateOnlineDatabase updateManager = UpdateOnlineDatabase();
+
 
   void _addToDatabase(String name, int age, String gender, String lookingFor) async
   {
-    addOnlineManager.addNewAccount(name, age, gender, lookingFor);
-
+    OnlineUserManager manager = OnlineUserManager();
+    manager.addNewAccount(name, age, gender, lookingFor);
   }
 
   void _updateUserAccount(String name, int age, String gender, String lookingFor) async
   {
-    updateManager.updateUserAccount(name, age, gender, lookingFor);
+    OnlineUserManager manager = OnlineUserManager();
+    manager.updateUserAccount(name, age, gender, lookingFor);
   }
 
   Future<bool> addUserDescription(String userDescription) async
   {
-    bool isDone = await addOnlineManager.addUserDescription(userDescription);
+    bool isDone = await OnlineDescriptionManager().addUserDescription(userDescription);
 
     return isDone;
   }
 
   void addImage(File image) async
   {
-      addOnlineManager.addUserImage(image);
+      OnlineImageManager().addUserImage(image);
   }
 
   void addVideo(File video) async
   {
-    addOnlineManager.addUserVideo(video);
+    OnlineVideoManager().addUserVideo(video);
   }
 
   void updateImage(File image) async
   {
-    updateManager.updateImage(image);
+    OnlineImageManager().updateImage(image);
   }
 
   void updateVideo(File video) async
   {
-    updateManager.updateVideo(video);
+    OnlineVideoManager().updateVideo(video);
   }
 
   void addFaceShape(String faceShape) async
   {
-    addOnlineManager.addFaceShape(faceShape);
+    OnlineImageManager().addFaceShape(faceShape);
   }
 
   Future<bool> addLikesAndHates() async
   {
     double dealBreakerFreshHold = 0.5;
     //ensures that the app awaits until function is complete
-    return addOnlineManager.addDescriptionValues(dealBreakerFreshHold);
+    return OnlineDescriptionValueManager().addDescriptionValues(dealBreakerFreshHold);
   }
 
   void addDescriptionValue(String name)
   {
     double dealBreakerFreshHold = 0.5;
-    addOnlineManager.addOneDescriptionValue(name, dealBreakerFreshHold);
+    OnlineDescriptionValueManager().addOneDescriptionValue(name, dealBreakerFreshHold);
   }
 
   addDescriptionStyle()
   {
-    addOnlineManager.addDescriptionStyle();
+    OnlineDescriptionManager().addDescriptionStyle();
   }
 
   addUserInterest(String name, bool isLiked)
   {
-    addOnlineManager.addUserInterest(name, isLiked);
+    OnlineDescriptionValueManager().addUserInterest(name, isLiked);
   }
 
   updateUserInterest(String documentId, bool isLiked, int oldValue)
   {
     if (isLiked == true)
       {
-        updateManager.updateLikedInterest(documentId, oldValue);
+        OnlineDescriptionValueManager().updateLikedInterest(documentId, oldValue);
       }
     else
       {
-        updateManager.updateHatedInterests(documentId, oldValue);
+        OnlineDescriptionValueManager().updateHatedInterests(documentId, oldValue);
       }
   }
 
@@ -153,8 +158,7 @@ class OnlineDatabaseManager
 
   Future<DocumentSnapshot> getDescription(String id) async
   {
-    GetOnlineManager getOnlineManager = GetOnlineManager();
-      return await getOnlineManager.getUserDescription(id);
+      return await OnlineDescriptionManager().getUserDescription(id);
   }
 
   void deleteOnlineInformation() async
@@ -207,7 +211,7 @@ class OnlineDatabaseManager
 
   void addCategoriesOnline()
   {
-   addOnlineManager.addCategories();
+   OnlineCategoriesManager().addCategories();
   }
 
 }
