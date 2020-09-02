@@ -20,6 +20,7 @@ import 'account_info.dart';
 //TODO add a star grading widget under the image just above the description
 //This will allow the user to grade the account as they are looking at it.
 
+int _maxGrade = 4;
 int _currentGrade = 0;
 
 class GradingScreen extends StatelessWidget {
@@ -51,7 +52,7 @@ class _StartGrading extends State<StarGrading>
       Row(
         mainAxisAlignment: MainAxisAlignment.center,
       mainAxisSize: MainAxisSize.min,
-      children: List.generate(4, (index) {
+      children: List.generate(_maxGrade, (index) {
         return
             IconButton(icon: Icon(
               index < _currentGrade ? MdiIcons.star : MdiIcons.starOutline,
@@ -313,7 +314,7 @@ class _GradingPage extends State<GradingPage>
               }
             else
               {
-                _currentGrade = 5;
+                _currentGrade = _maxGrade;
               }
 
             gradingPopup(context);
@@ -389,46 +390,6 @@ class _GradingPage extends State<GradingPage>
     screenTimer.stop();
     super.dispose();
   }
-
-  /*
-  Widget searchBar()
-  {
-    return Container(
-      //color: primaryLight,
-      height: 60,
-      child: Row(children: [
-        Flexible( child:
-        Container(
-          //height:50,
-          //color: Colors.white,
-          child:
-      TextField(
-          //controller: userNameController,
-          decoration: InputDecoration(
-              border: InputBorder.none,
-              hintText: "search"
-          )
-      ),
-        height: 50,
-        decoration: BoxDecoration(
-            color: Colors.white,
-            border: Border(bottom: BorderSide(color: primaryDark))
-        ),
-        margin: EdgeInsets.all(16.0),
-      ),
-          fit: FlexFit.tight,
-          flex: 4,
-        ),
-
-      Flexible(child:
-      IconButton(icon: Icon(MdiIcons.magnify), onPressed: (){},),
-        fit: FlexFit.loose,
-        flex: 1,
-      )
-
-      ],),
-    );
-  }*/
 
   Widget gradingMenu() {
     return Drawer(
@@ -562,7 +523,6 @@ class _GradingPage extends State<GradingPage>
 
             if(accounts.length < 3)
             {
-              //TODO get more accounts
               print("get more accounts");
 
               DBProvider.db.addHistory(lastId);
