@@ -120,6 +120,38 @@ void main() {
 
     });
 
+    test("perfect match test with updated search algorithm", (){
+
+      /*
+      Not mush has changed about how it works it just stops when it reaches the
+      fresh hold value and marks the result as a match.
+       */
+
+      List<String> accountLikes = ["1", "2", "3", "4", "5"];
+      List<String> accountHates = ["6", "7", "8", "9", "10"];
+
+      List<DescriptionValue> userLikes = setupList(["1", "2", "3", "4", "5"]);
+      List<DescriptionValue> userMustHaves = setupList(["1", "2", "3"]);
+      List<DescriptionValue> userHates = setupList(["6", "7", "8", "9", "10"]);
+      List<DescriptionValue> userMustNotHaves = setupList(["a", "b", "c"]);
+
+      Searcher searcher = Searcher();
+
+      int accuracy = 20;
+
+      int freshHold = ((accuracy / 100) * 400).round();
+
+      String userFaceShape = "";
+      String accountFaceShape = "";
+
+      bool result = searcher.isMatch(freshHold, accountFaceShape, userFaceShape,
+          accountLikes, accountHates,
+          userLikes, userHates, userMustHaves, userMustNotHaves);
+
+      expect(result, true);
+
+    });
+
     test("empty user input test", (){
       //In this test the algorithm will not be able to find a match
       //as the user will not provide anything to match

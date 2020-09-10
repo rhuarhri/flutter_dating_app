@@ -135,7 +135,7 @@ class DescriptionAnalyzer
   analyzeCategories(List<ClassifyTextResponse> data) async
   {
 
-    List<String> splitUpCategories = [];
+    List<String> splitUpCategories = ["blank"];
 
     if (data.isNotEmpty) {
       data.forEach((responses) {
@@ -166,10 +166,7 @@ class DescriptionAnalyzer
         splitUpCategories = ["blank"];
       }
 
-    if (splitUpCategories.isEmpty)
-      {
-        splitUpCategories = ["blank"];
-      }
+
 
     DBProvider.db.addCategories(splitUpCategories);
     OnlineDatabaseManager().addCategoriesOnline();

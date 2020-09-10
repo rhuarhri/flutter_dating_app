@@ -1,10 +1,11 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_screen_recording/flutter_screen_recording.dart';
+//import 'package:flutter_screen_recording/flutter_screen_recording.dart';
 import 'package:permission_handler/permission_handler.dart';
 import './color_scheme.dart';
 
+/*
 class Recorder
 {
   static String _fileName = "AppScreenRecording " + Random().nextInt(100).toString();
@@ -78,4 +79,5 @@ class Recorder
     print("video saved to " + path + "");
   }
 }
+*/
 

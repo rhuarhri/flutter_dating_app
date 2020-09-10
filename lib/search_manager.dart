@@ -17,6 +17,8 @@ class Searcher
   //This is the fresh hold that an account must score in order to match
   int _accuracy = 0;
 
+  int maxScore = 400;
+
   //this variable contains all the ids of the accounts that liked the user
   List<String> _likedAccounts = [];
 
@@ -72,7 +74,7 @@ class Searcher
 
     UserInfo userInfo = await DBProvider.db.getUser();
     double distance = userInfo.distance;
-    String faceShape = userInfo.faceShape;
+    String userFaceShape = userInfo.faceShape;
 
     Position usersPosition = await locationManager.getCurrentLocation();
 
@@ -118,6 +120,9 @@ class Searcher
             List<String> accountLikes = dynamicListToStringList(
                 element.data["likes"]);
 
+            /*
+            old version of the search algorithm
+
             int matchScore = calculateMatchRate(accountLikes, accountHates,
                 likes, hates, mustHaves, mustNotHaves);
 
@@ -136,6 +141,8 @@ class Searcher
                   }
               }
 
+
+
             //print("match sore is " + matchScore.toString());
 
             print("accuracy is " + _accuracy.toString());
@@ -149,6 +156,31 @@ class Searcher
             else {
               print("not a match");
             }
+
+             */
+
+            //New version
+
+            print("accuracy is " + _accuracy.toString());
+            int freshHold = ((_accuracy / 100) * maxScore).round();
+
+            String accountFaceShape = element.data["faceShape"].toString();
+
+            bool match = isMatch(freshHold, accountFaceShape, userFaceShape,
+                accountLikes, accountHates,
+                likes, hates, mustHaves, mustNotHaves);
+
+            if (match == true)
+              {
+                print("it a match");
+                int matchScore = 0; //this value does not exist anymore so is set to 0
+                _filteredResult.add(await _addToResult(element, usersPosition, matchScore));
+              }
+            else
+              {
+                print("not a match");
+              }
+
           }
         }
         else {
@@ -202,6 +234,7 @@ class Searcher
     return matchedAccount;
   }
 
+  /*
   bool isMatch()
   {
     bool isMatch = false;
@@ -209,7 +242,7 @@ class Searcher
 
 
     return isMatch;
-  }
+  }*/
 
   double findMatches(List<String> input, List<DescriptionValue> checkAgainst, bool isLiked) {
     if (checkAgainst.length < 0) {
@@ -275,6 +308,92 @@ class Searcher
     //OnlineDatabaseManager().addDescriptionValue(value.name);
 
   }
+
+  bool isMatch(int freshHold, String accountFaceShape, String userFaceShape,
+      List<String> accountLikes, List<String> accountHates,
+      List<DescriptionValue> userLikes, List<DescriptionValue> userHates,
+      List<DescriptionValue> userMustHaves, List<DescriptionValue> userMustNotHaves
+      )
+  {
+
+    int totalScore = 100;
+
+    double mustHaveScore = 0;
+
+    mustHaveScore = 100 - (findMatches(accountLikes, userMustHaves, true));
+
+    if (mustHaveScore != 0) {
+      mustHaveScore = (mustHaveScore * 2);
+    }
+
+    totalScore -= mustHaveScore.round();
+
+    if (totalScore >= freshHold)
+      {
+        /*
+        If the account being look at already meets the user's fresh hold
+        then there is no point continuing.
+         */
+
+        return true;
+      }
+
+    double mustNotHaveScore = 0;
+
+    mustNotHaveScore = (findMatches(accountLikes, userMustNotHaves, false));
+
+    totalScore += 100;
+
+    totalScore -= mustNotHaveScore.round();
+
+    //if the result is 100 then it is a perfect match
+    //if greater than 0 the score should be doubled
+    if (mustNotHaveScore > 0 && mustNotHaveScore < 100) {
+      mustNotHaveScore = mustNotHaveScore * 2;
+    }
+
+    if (totalScore >= freshHold)
+      {
+        return true;
+      }
+
+    double likeScore = 0;
+
+    likeScore = 100 - (findMatches(accountLikes, userLikes, true));
+
+    totalScore += 100;
+
+    totalScore -= likeScore.round();
+
+    if (totalScore >= freshHold)
+    {
+      return true;
+    }
+
+    double hateScore = 0;
+
+    hateScore = (findMatches(accountLikes, userHates, false));
+
+    totalScore += 100;
+
+    totalScore -= hateScore.round();
+
+    if (userFaceShape == accountFaceShape)
+    {
+      totalScore += 5;
+    }
+
+    if (totalScore >= freshHold)
+      {
+        return true;
+      }
+    else
+      {
+        return false;
+      }
+
+  }
+
 
   int calculateMatchRate(
     List<String> accountLikes, List<String> accountHates,
