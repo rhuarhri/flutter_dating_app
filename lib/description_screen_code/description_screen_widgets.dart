@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutterdatingapp/speech_to_text.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
-//import 'package:speech_to_text/speech_recognition_result.dart';
-//import 'package:speech_to_text/speech_to_text.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:speech_to_text/speech_recognition_result.dart';
 import '../color_scheme.dart';
@@ -235,22 +233,5 @@ class _DescriptionBody extends State<DescriptionBody>
     print("result is " + descriptionController.text);
   }
 
-  /*
-  void recordingPopup(BuildContext context)
-  {
-    String message = "";
-
-    if (_isRecording == true)
-      {
-        message = "Voice recording started. Press the microphone button to stop.";
-      }
-    else
-      {
-        message = "Voice recording stopped";
-      }
-
-    //popup("Voice recording", message, context, null);
-
-  }*/
 
 }

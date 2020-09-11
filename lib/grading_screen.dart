@@ -103,12 +103,6 @@ class _GradingPage extends State<GradingPage>
   SearchBar searchBar = SearchBar();
 
 
-  /*
-  @override
-  void initState() {
-    super.initState();
-  }*/
-
   List<AccountInfo> accounts = [];
 
   //The user will only have access to three options
@@ -231,12 +225,6 @@ class _GradingPage extends State<GradingPage>
 
     },);
   }
-
-  /*
-  Widget _matchScoreDisplay()
-  {
-    return Container(child: Text(getAccount(displayedOption).matchScore.toString()),);
-  }*/
 
   VideoPlayer videoPlayer = VideoPlayer();
   Widget gradingBody(BuildContext context) {

@@ -52,18 +52,6 @@ class GetOnlineManager
   Future<DocumentSnapshot> _documentFromID(String documentId) async
   {
 
-    //String idOfLastViewedUser = "";
-
-    /*
-    await DBProvider.db.getHistory().then((value) => {
-      idOfLastViewedUser = value.lastID,
-    });*/
-
-    /*History history = await DBProvider.db.getHistory();
-    idOfLastViewedUser = history.lastID;*/
-
-    //print("last id is " + idOfLastViewedUser);
-
     return databaseReference.collection("users").document(documentId).get();
 
   }

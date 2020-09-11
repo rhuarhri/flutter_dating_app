@@ -34,10 +34,7 @@ class DescriptionUpdateScreen extends StatelessWidget {
     };
 
     return DescriptionBody(onCompleteAction, context);
-    /*return Scaffold(
-      appBar: DescriptionScreenWidgets().descriptionAppBar(context),
-      body: DescriptionBody(onCompleteAction),
-    );*/
+
   }
 
   void toNextScreen(BuildContext context, String description) async

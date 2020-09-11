@@ -218,10 +218,6 @@ class _VideoRecorderBody extends State<VideoRecorderBody>
       toNextScreen();
     };
 
-    Function recordVideo = (){
-
-    };
-
     return showDialog(context: context, barrierDismissible: false,
         builder: (context) {
       return AlertDialog(
@@ -320,5 +316,3 @@ class _VideoRecorderBody extends State<VideoRecorderBody>
 
 
 }
-
-//example

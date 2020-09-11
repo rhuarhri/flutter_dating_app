@@ -234,16 +234,6 @@ class Searcher
     return matchedAccount;
   }
 
-  /*
-  bool isMatch()
-  {
-    bool isMatch = false;
-
-
-
-    return isMatch;
-  }*/
-
   double findMatches(List<String> input, List<DescriptionValue> checkAgainst, bool isLiked) {
     if (checkAgainst.length < 0) {
       //check against is empty so no matches can be found

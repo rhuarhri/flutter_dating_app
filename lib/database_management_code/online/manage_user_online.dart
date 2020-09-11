@@ -78,14 +78,6 @@ class OnlineUserManager
         }
     );
 
-    /*
-    databaseReference.collection("users").document(user.onlineLocation).collection("basicInfo").getDocuments()
-        .then((value) => {
-      databaseReference.collection("users").document(user.onlineLocation)
-          .collection("basicInfo").document(value.documents[0].documentID).updateData({
-        "name":name,
-      })
-    });*/
 
     _updateInternalDatabase(lookingFor);
   }

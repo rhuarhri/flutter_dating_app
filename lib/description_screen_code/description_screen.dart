@@ -39,12 +39,6 @@ class DescriptionScreen extends StatelessWidget {
 
     };
 
-    /*
-    return Scaffold(
-      appBar: DescriptionScreenWidgets().descriptionAppBar(context),
-      body: DescriptionBody(onCompleteAction),
-      floatingActionButton: actioBTN(),
-    );*/
     return DescriptionBody(onCompleteAction, context);
   }
 

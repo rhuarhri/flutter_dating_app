@@ -9,7 +9,6 @@ import 'package:material_design_icons_flutter/material_design_icons_flutter.dart
 import '../color_scheme.dart';
 import '../common_widgets.dart';
 import '../grading_screen.dart';
-//import '../screen_recorder.dart';
 
 class InterestsScreen extends StatelessWidget
 {
